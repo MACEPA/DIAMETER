@@ -1,67 +1,12 @@
 import pandas as pd
 import numpy as np
-import math
 from functools import partial, reduce
+# import helper function
+from data_processing.data_processing_helpers import run_compare
+# import constants
+from data_processing.data_processing_helpers import (DECISIONS,
+                                                     THRESHOLDS)
 
-
-# function for creating decision vector based on antigen value
-# at a specific concentration
-def run_compare(df, analyte_val):
-    above, below, llq, ulq, na = False, False, False, False, False
-    value = df[analyte_val]
-    try:
-        float_val = float(value)
-        if math.isnan(float_val):
-            na = True
-        elif float_val > threshholds[analyte_val]:
-            above = True
-        elif float_val < threshholds[analyte_val]:
-            below = True
-    except ValueError:
-        if '<' in value:
-            llq = True
-        elif '>' in value:
-            ulq = True
-    finally:
-        return np.array([above, below, llq, ulq, na])
-
-
-# create decision matrices for determining which concentration to use
-HRP2_matrix = np.array([['1:50', '1:50', '1:50', '1:50', '1:50'],
-                        ['1:50', 'neat', 'neat', '1:50', 'fail'],
-                        ['1:50', 'neat', 'neat', 'fail', 'fail'],
-                        ['1:50', '1:50', 'fail', '1:50', '1:50'],
-                        ['fail', '1:50', '1:50', 'fail', 'fail']])
-
-LDH_Pan_matrix = np.array([['1:50', 'neat', 'neat', '1:50', '1:50'],
-                           ['1:50', 'neat', 'neat', '1:50', 'fail'],
-                           ['1:50', 'neat', 'neat', 'fail', 'fail'],
-                           ['1:50', 'neat', 'fail', '1:50', '1:50'],
-                           ['fail', 'neat', 'neat', 'fail', 'fail']])
-
-LDH_Pv_matrix = np.array([['1:50', 'neat', 'neat', '1:50', '1:50'],
-                          ['1:50', 'neat', 'neat', '1:50', 'fail'],
-                          ['1:50', 'neat', 'neat', 'fail', 'fail'],
-                          ['1:50', 'neat', 'fail', '1:50', '1:50'],
-                          ['fail', 'neat', 'neat', 'fail', 'fail']])
-
-CRP_matrix = np.array([['1:50', 'neat', 'neat', '1:50', '1:50'],
-                       ['1:50', 'neat', 'neat', '1:50', 'fail'],
-                       ['1:50', 'neat', 'neat', 'fail', 'fail'],
-                       ['1:50', 'neat', 'fail', '1:50', '1:50'],
-                       ['fail', 'neat', 'neat', 'fail', 'fail']])
-
-# decisions for various analytes
-decisions = {'HRP2_pg_ml': HRP2_matrix, 'LDH_Pan_pg_ml': LDH_Pan_matrix,
-             'LDH_Pv_pg_ml': LDH_Pv_matrix, 'CRP_ng_ml': CRP_matrix}
-
-# threshhold values for various analytes
-threshholds = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
-               'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
-
-# positivity threshholds for various analytes
-pos_threshholds = {'HRP2_pg_ml': 2.3, 'LDH_Pan_pg_ml': 47.8,
-                   'LDH_Pv_pg_ml': 75.1, 'CRP_ng_ml': np.nan}
 
 for fname in ["file", "paths", "here"]:
     # read in data from flat file, columns must be in correct order
@@ -71,7 +16,8 @@ for fname in ["file", "paths", "here"]:
                                                       'LDH_Pan_pg_ml',
                                                       'LDH_Pv_pg_ml',
                                                       'CRP_ng_ml'])
-    plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+    plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(
+        x, str) else x)
     plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
     # subset data to just what we want
     samples_data = plex_data.loc[plex_data['patient_id'].str.contains('pa-')]
@@ -91,14 +37,14 @@ for fname in ["file", "paths", "here"]:
     # generate an empty list to fill with small dfs, which will be combined
     final_dfs = []
     # run counts for decision on what to keep
-    for analyte in threshholds.keys():
+    for analyte in THRESHOLDS.keys():
         # for analyte in ['HRP2_pg_ml']:
         # create partial function for generating decision vectors
         partial_compare = partial(run_compare, analyte_val=analyte)
         # generate decision vectors
         samples_data['decision_vector'] = samples_data.apply(partial_compare, axis=1)
         # pull decision matrix for given analyte
-        decision_matrix = decisions[analyte]
+        decision_matrix = DECISIONS[analyte]
         # generate an empty list to fill with tiny dfs, which will be combined
         tiny_dfs = []
         # iterate over patient_ids
