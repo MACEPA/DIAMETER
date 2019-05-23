@@ -38,7 +38,6 @@ for fname in ["file", "paths", "here"]:
     final_dfs = []
     # run counts for decision on what to keep
     for analyte in THRESHOLDS.keys():
-        # for analyte in ['HRP2_pg_ml']:
         # create partial function for generating decision vectors
         partial_compare = partial(run_compare, analyte_val=analyte)
         # generate decision vectors
