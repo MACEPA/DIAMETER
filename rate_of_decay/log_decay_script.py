@@ -94,8 +94,9 @@ for analyte in time_df['analyte'].unique():
         concentration_df = pd.concat(concentration_dfs)
         concentration_df.drop(concentration, axis=1, inplace=True)
         analyte_dfs.append(concentration_df)
-    analyte_df = reduce(lambda left, right: pd.merge(left, right, on=['analyte', 'treatment_condition',
-                                                                      'time_or_humidity']), analyte_dfs)
+    analyte_df = reduce(lambda left, right: pd.merge(left, right,
+                                                     on=['analyte', 'treatment_condition',
+                                                         'time_or_humidity']), analyte_dfs)
     main_dfs.append(analyte_df)
 pp.close()
 main_df = pd.concat(main_dfs)
