@@ -42,6 +42,8 @@ def main():
         for max_dilution in DIL_CONSTANTS.keys():
             # create partial function for generating decision vectors
             partial_compare = partial(run_compare, analyte_val=analyte)
+            # get number of dilutions
+            dilution_number = len(samples_data['concentration'].unique().tolist())
             # generate decision vectors
             samples_data['decision_vector'] = samples_data.apply(partial_compare, axis=1)
             # generate all decicion matrices given current concentrations
@@ -60,7 +62,7 @@ def main():
                 tiny_df = tiny_df[['patient_id', 'comparison', '{}_dilution'.format(analyte),
                                    '{}_well'.format(analyte)]]
                 sub_data = samples_data.loc[samples_data['patient_id'] == i]
-                if len(sub_data) == (len(DIL_CONSTANTS) + 1):
+                if len(sub_data) == dilution_number:
                     vector_low = sub_data.loc[sub_data['concentration'].str.contains(low),
                                               'decision_vector'].item()
                     vector_high = sub_data.loc[sub_data['concentration'].str.contains(high),
