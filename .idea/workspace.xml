@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="" />
+    <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,24 +16,24 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
+        <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay_script.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="884">
-              <caret line="59" column="32" selection-start-line="59" selection-start-column="22" selection-end-line="59" selection-end-column="32" />
+            <state relative-caret-position="411">
+              <caret line="98" column="31" selection-start-line="98" selection-start-column="31" selection-end-line="98" selection-end-column="31" />
               <folding>
-                <element signature="e#0#19#0" expanded="true" />
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay_script.py">
+        <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="539">
-              <caret line="91" column="73" lean-forward="true" selection-start-line="91" selection-start-column="73" selection-end-line="91" selection-end-column="73" />
+            <state relative-caret-position="581">
+              <caret line="84" column="41" lean-forward="true" selection-start-line="84" selection-start-column="41" selection-end-line="84" selection-end-column="41" />
               <folding>
-                <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#0#19#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -37,11 +42,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_processing/data_processing_helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
-              <folding>
-                <element signature="e#0#11#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="-609">
+              <caret column="11" lean-forward="true" selection-start-column="11" selection-end-column="11" />
             </state>
           </provider>
         </entry>
@@ -62,17 +64,17 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/data_processing" />
-        <option value="$PROJECT_DIR$/data_processing/data_processing_helpers.py" />
-        <option value="$PROJECT_DIR$/data_processing/data_processing.py" />
         <option value="$PROJECT_DIR$/data_processing/test.py" />
         <option value="$PROJECT_DIR$/rate_of_decay/log_decay_script.py" />
+        <option value="$PROJECT_DIR$/data_processing/data_processing_helpers.py" />
+        <option value="$PROJECT_DIR$/data_processing/data_processing.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="-7" />
-    <option name="width" value="854" />
-    <option name="height" value="1017" />
+    <option name="width" value="974" />
+    <option name="height" value="1047" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -135,7 +137,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="854" height="1017" extended-state="1" />
+    <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.29596978" />
@@ -149,7 +151,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" weight="0.2844345" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.27461708" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.2844345" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32918552" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -204,32 +206,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
+    <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay_script.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="884">
-          <caret line="59" column="32" selection-start-line="59" selection-start-column="22" selection-end-line="59" selection-end-column="32" />
+        <state relative-caret-position="411">
+          <caret line="98" column="31" selection-start-line="98" selection-start-column="31" selection-end-line="98" selection-end-column="31" />
           <folding>
-            <element signature="e#0#19#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_processing_helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-609">
+          <caret column="11" lean-forward="true" selection-start-column="11" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay_script.py">
+    <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="539">
-          <caret line="91" column="73" lean-forward="true" selection-start-line="91" selection-start-column="73" selection-end-line="91" selection-end-column="73" />
+        <state relative-caret-position="581">
+          <caret line="84" column="41" lean-forward="true" selection-start-line="84" selection-start-column="41" selection-end-line="84" selection-end-column="41" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>
