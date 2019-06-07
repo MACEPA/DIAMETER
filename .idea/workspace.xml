@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="581">
-              <caret line="84" column="41" lean-forward="true" selection-start-line="84" selection-start-column="41" selection-end-line="84" selection-end-column="41" />
+            <state relative-caret-position="-651">
+              <caret line="26" column="39" lean-forward="true" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -71,10 +68,10 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
-    <option name="width" value="974" />
-    <option name="height" value="1047" />
+    <option name="width" value="854" />
+    <option name="height" value="1017" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -137,7 +134,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.29596978" />
@@ -151,7 +148,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.27461708" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.27193934" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.2844345" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32918552" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -225,8 +222,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="581">
-          <caret line="84" column="41" lean-forward="true" selection-start-line="84" selection-start-column="41" selection-end-line="84" selection-end-column="41" />
+        <state relative-caret-position="-651">
+          <caret line="26" column="39" lean-forward="true" selection-start-line="26" selection-start-column="39" selection-end-line="26" selection-end-column="39" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>

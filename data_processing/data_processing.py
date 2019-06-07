@@ -18,9 +18,9 @@ def main():
         plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
         plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
         dfs.append(plex_data)
-    combined = pd.concat(dfs)
+    samples_data = pd.concat(dfs)
     # subset data to just what we want
-    samples_data = combined.loc[combined['patient_id'].str.contains('pa-')]
+    samples_data = samples_data.loc[samples_data['patient_id'].str.contains('pa-')]
     samples_data = samples_data.drop('type', axis=1)
     # rename patient_id and create concentration column
     samples_data['concentration'] = samples_data['patient_id'].apply(
