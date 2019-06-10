@@ -4,12 +4,12 @@ from functools import partial, reduce
 # import helper function
 from data_processing.data_processing_helpers import run_compare, return_decisions
 # import constants
-from data_processing.data_processing_helpers import (DIL_CONSTANTS, DILUTION_SETS, THRESHOLDS)
+from data_processing.data_processing_helpers import DIL_CONSTANTS, DILUTION_SETS, THRESHOLDS
 
 
 def main():
     dfs = []
-    for fname in ["file", "paths", "here"]:
+    for fname in ['other_dilutions_input', 'neat_dilution_input']:
         # read in data from flat file, columns must be in correct order
         plex_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/test_data/{}.csv'.format(fname),
                                 skiprows=8, names=['patient_id', 'type', 'well', 'error',
@@ -55,30 +55,43 @@ def main():
             tiny_dfs = []
             # iterate over patient_ids
             for i in samples_data['patient_id'].unique().tolist():
+                # create a dumby dataframe to fill later
                 tiny_df = pd.DataFrame(columns=['patient_id', analyte,
                                                 '{}_dilution'.format(analyte),
                                                 '{}_well'.format(analyte)])
                 tiny_df['comparison'] = '{} vs {}'.format(low, high)
                 tiny_df = tiny_df[['patient_id', 'comparison', '{}_dilution'.format(analyte),
                                    '{}_well'.format(analyte)]]
+                # subset data to current patient_id
                 sub_data = samples_data.loc[samples_data['patient_id'] == i]
+                # only run the decision process if all possible concentrations exist for the
+                # current patient_id
                 if len(sub_data) == dilution_number:
+                    # return low concentration deicision vector
                     vector_low = sub_data.loc[sub_data['concentration'].str.contains(low),
                                               'decision_vector'].item()
+                    # return high concentration decision vector
                     vector_high = sub_data.loc[sub_data['concentration'].str.contains(high),
                                                'decision_vector'].item()
+                    # determine decision using low and high decision vectors
                     decision = decision_matrix[vector_low, vector_high].item()
+                    # if the decision is one of the low or high concentrations, set val and
+                    # well accordingly
                     if decision in [low, high]:
                         val = sub_data.loc[sub_data['concentration'].str.contains(decision),
                                            analyte].item()
                         well = sub_data.loc[sub_data['concentration'].str.contains(decision),
                                             'well'].item()
+                    # if the decision is the fail case, set val and well to NaN
                     elif decision == fail:
                         val = np.nan
                         well = np.nan
+                    # otherwise, something went wrong...
                     else:
                         raise ValueError("Unexpected decision value: {}".format(decision))
-                    tiny_df = tiny_df.append({'patient_id': i, 'comparison': '{} vs {}'.format(low, high),
+                    # append everything on and combine up
+                    tiny_df = tiny_df.append({'patient_id': i,
+                                              'comparison': '{} vs {}'.format(low, high),
                                               analyte: val, '{}_dilution'.format(analyte): decision,
                                               '{}_well'.format(analyte): well}, ignore_index=True)
                     tiny_dfs.append(tiny_df)
