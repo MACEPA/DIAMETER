@@ -46,7 +46,7 @@ def main():
         for i in samples_data['patient_id'].unique():
             patient_data = samples_data.loc[samples_data['patient_id'] == i]
             # get number of dilutions
-            dilution_values = [val for val in patient_data['concentration'].unique() if val != 1]
+            dilution_values = sorted([val for val in patient_data['concentration'].unique() if val != '1'], key=len)
             # set initial best decision to neat (1)
             best_decision = '1'
             # iterate over dilution values
@@ -54,8 +54,7 @@ def main():
                 # subset to dilutions
                 dil_data = patient_data.loc[patient_data['concentration'].isin([best_decision, max_dilution])]
                 # create partial function for generating decision vectors
-                dil_constant = (int(max_dilution) / int(best_decision)) / 50
-                partial_compare = partial(run_compare, analyte_val=analyte, dil_constant=dil_constant)
+                partial_compare = partial(run_compare, analyte_val=analyte, dil_val=max_dilution)
                 # generate decision vectors
                 dil_data['decision_vector'] = dil_data.apply(partial_compare, axis=1)
                 # pull decision matrix for given analyte and concentrations
@@ -71,7 +70,7 @@ def main():
                                               'decision_vector'].item()
                     vector_high = dil_data.loc[dil_data['concentration'] == max_dilution,
                                                'decision_vector'].item()
-                    decision = decision_matrix[vector_low, vector_high].item()
+                    decision = decision_matrix[vector_high, vector_low].item()
                     if decision in [best_decision, max_dilution]:
                         val = dil_data.loc[dil_data['concentration'] == decision,
                                            analyte].item()

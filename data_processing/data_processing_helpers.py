@@ -4,10 +4,10 @@ import numpy as np
 
 # function for creating decision vector based on antigen value
 # at a specific concentration
-def run_compare(df, analyte_val, dil_constant):
+def run_compare(df, analyte_val, dil_val):
     above, below, llq, ulq, na = False, False, False, False, False
     val = df[analyte_val]
-    thresh_val = dil_constant * THRESHOLDS[analyte_val]
+    thresh_val = DIL_CONSTANTS[dil_val] * THRESHOLDS[analyte_val]
     try:
         float_val = float(val)
         if math.isnan(float_val):
@@ -66,11 +66,11 @@ POS_THRESHOLDS = {'HRP2_pg_ml': 2.3, 'LDH_Pan_pg_ml': 47.8,
                   'LDH_Pv_pg_ml': 75.1, 'CRP_ng_ml': np.nan}
 
 # constant to apply to the threshhold for different dilutions
-DIL_CONSTANTS = {'50x': 1, '2500x': 50, '125000x': 2500,
-                 '6250000x': 125000, '312500000x': 6250000}
+DIL_CONSTANTS = {'50': 1, '2500': 50, '125000': 2500,
+                 '6250000': 125000, '312500000': 6250000}
 
 # dilution sets for various dilutions
-DILUTION_SETS = {'50x': ('neat', '50x', 'fail'), '2500x': ('50x', '2500x', 'fail'),
-                 '125000x': ('2500x', '125000x', 'fail'),
-                 '6250000x': ('125000x', '6250000x', 'fail'),
-                 '312500000x': ('6250000x', '312500000x', 'fail')}
+DILUTION_SETS = {'50': ('1', '50', 'fail'), '2500': ('50', '2500', 'fail'),
+                 '125000': ('2500', '125000', 'fail'),
+                 '6250000': ('125000', '6250000', 'fail'),
+                 '312500000': ('6250000', '312500000', 'fail')}
