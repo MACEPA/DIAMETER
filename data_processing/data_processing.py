@@ -5,7 +5,7 @@ from functools import partial, reduce
 # import helper function
 from data_processing.data_processing_helpers import run_compare, return_decisions, fix_concentrations
 # import constants
-from data_processing.data_processing_helpers import DIL_CONSTANTS, DILUTION_SETS, THRESHOLDS
+from data_processing.data_processing_helpers import THRESHOLDS
 
 
 def main():
@@ -22,7 +22,7 @@ def main():
         dfs.append(plex_data)
     samples_data = pd.concat(dfs)
     # subset data to just what we want
-    samples_data= samples_data.loc[~samples_data['type'].isnull()]
+    samples_data = samples_data.loc[~samples_data['type'].isnull()]
     samples_data = samples_data.loc[~samples_data['type'].str.contains('pixel')]
     samples_data = samples_data.loc[samples_data['patient_id'].str.contains('pa-')]
     samples_data = samples_data.drop('type', axis=1)
@@ -95,6 +95,7 @@ def main():
         patient_df = pd.concat(patient_dfs)
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
     return output_df
 
 
