@@ -95,7 +95,7 @@ def main():
         patient_df = pd.concat(patient_dfs)
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
-    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
+    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv', index=False)
     return output_df
 
 
