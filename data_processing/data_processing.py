@@ -78,8 +78,8 @@ def main():
                                             'well'].item()
                         best_decision = decision
                     elif decision == 'fail':
-                        val = np.nan
-                        well = np.nan
+                        val = 'fail'
+                        well = 'fail'
                     else:
                         raise ValueError("Unexpected decision value: {}".format(decision))
                     best_df = best_df.append({'patient_id': i, analyte: val,
