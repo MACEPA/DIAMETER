@@ -5,6 +5,7 @@
       <change beforePath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/4plex_combined_dilutions-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/4plex_combined_dilutions.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing_helpers.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,10 +18,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="81" column="36" selection-start-line="81" selection-start-column="36" selection-end-line="81" selection-end-column="36" />
+            <state relative-caret-position="459">
+              <caret line="102" column="87" selection-start-line="102" selection-start-column="87" selection-end-line="102" selection-end-column="87" />
               <folding>
-                <element signature="e#0#6#0" expanded="true" />
+                <element signature="e#0#9#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -29,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_processing/data_processing_helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1173">
-              <caret line="69" column="57" lean-forward="true" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
+            <state relative-caret-position="526">
+              <caret line="73" selection-start-line="73" selection-end-line="73" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -61,10 +62,10 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="x" value="-7" />
-    <option name="width" value="974" />
-    <option name="height" value="1047" />
+    <option name="width" value="854" />
+    <option name="height" value="1017" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -127,7 +128,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <frame x="-7" y="0" width="854" height="1017" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.29596978" />
@@ -141,7 +142,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.27099663" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.27375567" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.2844345" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.32918552" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -208,8 +209,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_processing_helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1173">
-          <caret line="69" column="57" lean-forward="true" selection-start-line="69" selection-start-column="57" selection-end-line="69" selection-end-column="57" />
+        <state relative-caret-position="526">
+          <caret line="73" selection-start-line="73" selection-end-line="73" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
@@ -218,10 +219,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="81" column="36" selection-start-line="81" selection-start-column="36" selection-end-line="81" selection-end-column="36" />
+        <state relative-caret-position="459">
+          <caret line="102" column="87" selection-start-line="102" selection-start-column="87" selection-end-line="102" selection-end-column="87" />
           <folding>
-            <element signature="e#0#6#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>

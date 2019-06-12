@@ -39,7 +39,7 @@ def fix_concentrations(df):
 def return_decisions(low, high, fail='fail'):
     # Columns = [neat_above, neat_below, neat_LLQ, neat_ULQ, NA]
     # Rows = [dil_above, dil_below, dil_LLQ, dil_ULQ, NA]
-    HRP2_matrix = np.array([[high, high, high, high, high],
+    hrp2_matrix = np.array([[high, high, high, high, high],
                             [high, low, low, high, fail],
                             [high, low, low, fail, fail],
                             [high, high, fail, high, high],
@@ -52,9 +52,25 @@ def return_decisions(low, high, fail='fail'):
                                [fail, low, low, fail, fail]])
 
     # decisions for various analytes
-    decisions = {'HRP2_pg_ml': HRP2_matrix, 'LDH_Pan_pg_ml': other_matrix,
+    decisions = {'HRP2_pg_ml': hrp2_matrix, 'LDH_Pan_pg_ml': other_matrix,
                  'LDH_Pv_pg_ml': other_matrix, 'CRP_ng_ml': other_matrix}
     return decisions
+
+
+# function for splitting off time
+def split_time(df):
+    sub = df['patient_id'].split('-')
+    try:
+        time = int(sub[2])
+        return time
+    except IndexError:
+        return 0
+
+
+# function for removing time once it's split
+def remove_time(df):
+    patient = df['patient_id'].split('-')
+    return '{}-{}'.format(patient[0], patient[1])
 
 
 # threshhold values for various analytes

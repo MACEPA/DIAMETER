@@ -3,7 +3,9 @@ import pandas as pd
 import numpy as np
 from functools import partial, reduce
 # import helper function
-from data_processing.data_processing_helpers import run_compare, return_decisions, fix_concentrations
+from data_processing.data_processing_helpers import (run_compare, return_decisions,
+                                                     fix_concentrations, split_time,
+                                                     remove_time)
 # import constants
 from data_processing.data_processing_helpers import THRESHOLDS
 
@@ -94,7 +96,11 @@ def main():
         patient_df = pd.concat(patient_dfs)
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
-    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv', index=False)
+    output_df['time'] = output_df.apply(split_time, axis=1)
+    output_df['patient_id'] = output_df.apply(remove_time, axis=1)
+    output_df.sort_values(['patient_id', 'time'], inplace=True)
+    output_df.set_index(['patient_id', 'time'], inplace=True)
+    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
     return output_df
 
 
