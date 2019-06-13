@@ -39,8 +39,10 @@ def main():
     samples_data['concentration'] = samples_data.apply(fix_concentrations, axis=1)
     samples_data = samples_data.sort_values(['patient_id', 'well'])
 
-    # generate an empty list to fill with small dfs, which will be combined
+    # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
+    # create an empty list to fill with problem patient_ids
+    error_ids = []
     # run counts for decision on what to keep
     for analyte in THRESHOLDS.keys():
         patient_dfs = []
@@ -90,8 +92,10 @@ def main():
                     best_decision = decision
                     if decision == 'fail':
                         break
-                except ValueError:
-                    print("ValueError:", analyte, max_dilution, i)
+                except ValueError as e:
+                    if str(e) != 'can only convert an array of size 1 to a Python scalar':
+                        raise
+                    error_ids.append(i)
             patient_dfs.append(best_df)
         patient_df = pd.concat(patient_dfs)
         analyte_dfs.append(patient_df)
