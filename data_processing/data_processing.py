@@ -138,6 +138,7 @@ def main():
         patient_df = pd.concat(patient_dfs)
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    # split time associated with patient_id into its own column
     output_df['time'] = output_df.apply(split_time, axis=1)
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
     output_df.sort_values(['patient_id', 'time'], inplace=True)
