@@ -142,7 +142,7 @@ def main():
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
     output_df.sort_values(['patient_id', 'time'], inplace=True)
     output_df.set_index(['patient_id', 'time'], inplace=True)
-    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
+    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time.csv')
     return output_df
 
 
