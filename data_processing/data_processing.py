@@ -139,10 +139,10 @@ def main():
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
     # split time associated with patient_id into its own column
-    output_df['time'] = output_df.apply(split_time, axis=1)
+    output_df['time_point_days'] = output_df.apply(split_time, axis=1)
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
-    output_df.sort_values(['patient_id', 'time'], inplace=True)
-    output_df.set_index(['patient_id', 'time'], inplace=True)
+    output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
+    output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
     output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time.csv')
     return output_df
 
