@@ -128,9 +128,14 @@ def main():
                     well = 'fail'
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
+                other_dilutions = [val for val in patient_data['concentration'].unique()]
+                other_dilutions = [float(val) for val in other_dilutions if val != 'fail']
+                max_dilution = max(other_dilutions)
+                df_decision = decision if decision != 'fail' else np.nan
                 best_df = best_df.append({'patient_id': i, analyte: val,
-                                          '{}_dilution'.format(analyte): decision,
-                                          '{}_well'.format(analyte): well}, ignore_index=True)
+                                          '{}_dilution'.format(analyte): df_decision,
+                                          '{}_well'.format(analyte): well,
+                                          '{}_max_dilution'.format(analyte): max_dilution}, ignore_index=True)
                 best_decision = decision
                 if decision == 'fail':
                     break
