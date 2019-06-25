@@ -8,7 +8,7 @@ from data_processing.data_viz_helpers import clean_strings
 
 def main():
     # read in formatted dilution CSV
-    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time.csv')
+    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time_error.csv')
     # set list of analytes for 4plex
     analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
     # associate colors to different dilution values
@@ -24,7 +24,7 @@ def main():
         for pid in main_data['patient_id'].unique():
             # subset data
             pid_data = main_data.loc[main_data['patient_id'] == pid]
-            plot_data = pid_data[['patient_id', 'time', analyte, '{}_dilution'.format(analyte),
+            plot_data = pid_data[['patient_id', 'time_point_days', analyte, '{}_dilution'.format(analyte),
                                   '{}_max_dilution'.format(analyte)]]
             plot_data[analyte] = plot_data[analyte].apply(clean_strings)
             plot_data[analyte] = plot_data[analyte].apply(float)
@@ -40,11 +40,11 @@ def main():
             f = plt.figure()
             ax = f.add_subplot()
             # line plot with "interest" color
-            plt.plot(plot_data['time'], plot_data[analyte], color=plt_color, alpha=0.3)
+            plt.plot(plot_data['time_point_days'], plot_data[analyte], color=plt_color, alpha=0.3)
             dil_vals = plot_data['{}_dilution'.format(analyte)].tolist()
             dil_vals = [str(val) if val != 'fail' else val for val in dil_vals]
             vals = plot_data[analyte].tolist()
-            time = plot_data['time'].tolist()
+            time = plot_data['time_point_days'].tolist()
             # return the maximum dilution available for each data point
             maximum = plot_data['{}_max_dilution'.format(analyte)]
             data = zip(time, vals)
