@@ -32,7 +32,7 @@ def main():
     samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[-1])
     samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[0])
     samples_data = samples_data.loc[
-        (samples_data['concentration'].str.contains('neat|50|2500|125000|6250000|312500000'))]
+        (samples_data['concentration'].str.contains('neat|50'))]
     samples_data = samples_data.loc[~samples_data['concentration'].str.contains('low volume')]
     samples_data = samples_data.loc[~samples_data['well'].isnull()]
     # fix concentrations
@@ -59,7 +59,11 @@ def main():
                 wells = dup_con['well'].tolist()
                 wells = ''.join(c for c in str(wells) if c not in ["[", "]", "'"])
                 errors = dup_con['error'].tolist()
-                errors = ''.join(c for c in str(errors) if c not in ["[", "]", "'"])
+                non_nan_error = [e for e in errors if e is not np.nan]
+                if not non_nan_error:
+                    errors = np.nan
+                else:
+                    errors = non_nan_error
                 try:
                     # if they're both real numbers, take the average
                     values = [float(val) for val in values.tolist()]
@@ -110,7 +114,7 @@ def main():
                 decisions = return_decisions(best_decision, max_dilution)
                 decision_matrix = decisions[analyte]
                 # construct empty dataframe to hold best values
-                best_df = pd.DataFrame(columns=['patient_id', analyte,
+                best_df = pd.DataFrame(columns=['patient_id', 'error', analyte,
                                                 '{}_dilution'.format(analyte),
                                                 '{}_well'.format(analyte)])
                 vector_low = dil_data.loc[dil_data['concentration'] == best_decision,
@@ -123,16 +127,19 @@ def main():
                                        analyte].item()
                     well = dil_data.loc[dil_data['concentration'] == decision,
                                         'well'].item()
+                    error = dil_data.loc[dil_data['concentration'] == decision,
+                                         'error'].item()
                 elif decision == 'fail':
                     val = 'fail'
                     well = 'fail'
+                    error = np.nan
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
                 other_dilutions = [val for val in patient_data['concentration'].unique()]
                 other_dilutions = [float(val) for val in other_dilutions if val != 'fail']
                 max_dilution = max(other_dilutions)
                 df_decision = decision if decision != 'fail' else np.nan
-                best_df = best_df.append({'patient_id': i, analyte: val,
+                best_df = best_df.append({'patient_id': i, 'error': error, analyte: val,
                                           '{}_dilution'.format(analyte): df_decision,
                                           '{}_well'.format(analyte): well,
                                           '{}_max_dilution'.format(analyte): max_dilution}, ignore_index=True)
