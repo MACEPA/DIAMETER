@@ -10,7 +10,7 @@ from data_processing.data_processing_helpers import (run_compare, return_decisio
 from data_processing.data_processing_helpers import THRESHOLDS
 
 
-# function for combining duplilcates
+# function for combining duplicates
 def deduplicate(duplicate_df):
     deduped_dfs = []
     for analyte in THRESHOLDS.keys():
@@ -60,6 +60,7 @@ def deduplicate(duplicate_df):
     return deduped
 
 
+# function for determining which dilution value to use
 def decider(base_df):
     # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
