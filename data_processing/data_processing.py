@@ -10,6 +10,7 @@ from data_processing.data_processing_helpers import (run_compare, return_decisio
 from data_processing.data_processing_helpers import THRESHOLDS
 
 
+# function for combining duplilcates
 def deduplicate(duplicate_df):
     deduped_dfs = []
     for analyte in THRESHOLDS.keys():
@@ -87,11 +88,14 @@ def decider(base_df):
                 best_df = pd.DataFrame(columns=['patient_id', 'errors', analyte,
                                                 '{}_dilution'.format(analyte),
                                                 '{}_well'.format(analyte)])
+                # get decision vectors for each possible decision
                 vector_low = dil_data.loc[dil_data['concentration'] == best_decision,
                                           'decision_vector'].item()
                 vector_high = dil_data.loc[dil_data['concentration'] == max_dilution,
                                            'decision_vector'].item()
+                # get actual decision from decision vectors
                 decision = decision_matrix[vector_high, vector_low].item()
+                # set value, well, and error based on decision
                 if decision in [best_decision, max_dilution]:
                     val = dil_data.loc[dil_data['concentration'] == decision,
                                        analyte].item()
@@ -118,6 +122,7 @@ def decider(base_df):
                     break
             patient_dfs.append(best_df)
         patient_df = pd.concat(patient_dfs)
+        # set all error columns to object for combination later
         patient_df['errors'] = patient_df['errors'].astype('object')
         analyte_dfs.append(patient_df)
     decided = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
@@ -127,6 +132,7 @@ def decider(base_df):
 def main():
     dfs = []
     input_path = 'C:/Users/lzoeckler/Desktop/4plex/input_data/20190610'
+    # get all input data, combine into one df
     for fname in os.listdir(input_path):
         plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
                                 skiprows=8, names=['patient_id', 'type', 'well', 'error',
@@ -163,6 +169,7 @@ def main():
     # split time associated with patient_id into its own column
     output_df['time_point_days'] = output_df.apply(split_time, axis=1)
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
+    # sort values and output to a csv
     output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
     output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
     output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time.csv')
