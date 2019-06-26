@@ -12,8 +12,8 @@ def main():
     # set list of analytes for 4plex
     analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
     # associate colors to different dilution values
-    all_colors = cm.rainbow(np.linspace(0, 1, 6))
-    all_dilutions = ['1', '50', '2500', '125000', '6250000', '312500000']
+    all_colors = cm.rainbow(np.linspace(0, 1, 8))
+    all_dilutions = ['1', '50', '2500', '125000', '6250000', '312500000', '15625000000', '781250000000']
     combo = zip(all_dilutions, all_colors)
     color_dict = {dil: val for dil, val in combo}
     color_dict['fail'] = np.array([0.0, 0.0, 0.0, 0.0])

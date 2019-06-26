@@ -114,7 +114,7 @@ def main():
                 decisions = return_decisions(best_decision, max_dilution)
                 decision_matrix = decisions[analyte]
                 # construct empty dataframe to hold best values
-                best_df = pd.DataFrame(columns=['patient_id', 'error', analyte,
+                best_df = pd.DataFrame(columns=['patient_id', 'errors', analyte,
                                                 '{}_dilution'.format(analyte),
                                                 '{}_well'.format(analyte)])
                 vector_low = dil_data.loc[dil_data['concentration'] == best_decision,
@@ -132,14 +132,14 @@ def main():
                 elif decision == 'fail':
                     val = 'fail'
                     well = 'fail'
-                    error = np.nan
+                    error = 'fail'
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
                 other_dilutions = [val for val in patient_data['concentration'].unique()]
                 other_dilutions = [float(val) for val in other_dilutions if val != 'fail']
                 max_dilution = max(other_dilutions)
                 df_decision = decision if decision != 'fail' else np.nan
-                best_df = best_df.append({'patient_id': i, 'error': error, analyte: val,
+                best_df = best_df.append({'patient_id': i, 'errors': error, analyte: val,
                                           '{}_dilution'.format(analyte): df_decision,
                                           '{}_well'.format(analyte): well,
                                           '{}_max_dilution'.format(analyte): max_dilution}, ignore_index=True)
@@ -148,6 +148,7 @@ def main():
                     break
             patient_dfs.append(best_df)
         patient_df = pd.concat(patient_dfs)
+        patient_df['errors'] = patient_df['errors'].astype('object')
         analyte_dfs.append(patient_df)
     output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
     # split time associated with patient_id into its own column
