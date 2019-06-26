@@ -172,7 +172,7 @@ def main():
     # sort values and output to a csv
     output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
     output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
-    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time.csv')
+    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
     return output_df
 
 

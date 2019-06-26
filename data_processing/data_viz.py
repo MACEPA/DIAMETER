@@ -8,7 +8,7 @@ from data_processing.data_viz_helpers import clean_strings
 
 def main():
     # read in formatted dilution CSV
-    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions_time_error.csv')
+    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
     # set list of analytes for 4plex
     analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
     # associate colors to different dilution values
@@ -19,7 +19,7 @@ def main():
     color_dict['fail'] = np.array([0.0, 0.0, 0.0, 0.0])
     # loop through analytes to create different PDFs for each
     for analyte in analytes:
-        pp = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_color_graphs_ugly.pdf'.format(analyte))
+        pp = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_graphs.pdf'.format(analyte))
         # create individual graphs for each patient_id
         for pid in main_data['patient_id'].unique():
             # subset data
