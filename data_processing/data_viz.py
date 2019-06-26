@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.backends.backend_pdf import PdfPages
 from data_processing.data_viz_helpers import clean_strings
 
@@ -11,12 +12,15 @@ def main():
     main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
     # set list of analytes for 4plex
     analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
-    # associate colors to different dilution values
+    # associate colors and shapes to different dilution values
     all_colors = cm.rainbow(np.linspace(0, 1, 8))
     all_dilutions = ['1', '50', '2500', '125000', '6250000', '312500000', '15625000000', '781250000000']
+    all_shapes = ['+', 'v', 's', 'p', 'd', '^', '.', '*']
     combo = zip(all_dilutions, all_colors)
     color_dict = {dil: val for dil, val in combo}
     color_dict['fail'] = np.array([0.0, 0.0, 0.0, 0.0])
+    shape_combo = zip(all_dilutions, all_shapes)
+    shape_dict = {dil: val for dil, val in shape_combo}
     # loop through analytes to create different PDFs for each
     for analyte in analytes:
         pp = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_graphs.pdf'.format(analyte))
@@ -49,28 +53,38 @@ def main():
             maximum = plot_data['{}_max_dilution'.format(analyte)]
             data = zip(time, vals)
             # plot the data points in a scatter with color indicating dilution
-            # also label the points with the max dilution available
-            for data, group, text in zip(data, dil_vals, maximum):
+            # and size indicating maximum dilution
+            color_legend = []
+            used_dil = []
+            shape_legend = []
+            used_shapes = []
+            for data, group, max_dil in zip(data, dil_vals, maximum):
                 x, y = data
                 color = color_dict[group]
-                plt.scatter(x, y, c=[color], label=group, alpha=1.0)
-                ax.annotate(text, (x, y))
-            ax.legend()
-            hand, labl = ax.get_legend_handles_labels()
-            handout = []
-            lablout = []
-            # fix legend to not duplicate entries
-            for h, l in zip(hand, labl):
-                if l not in lablout:
-                    lablout.append(l)
-                    handout.append(h)
-            ax.legend(handout, lablout, title='Dilution')
+                max_dil = str(int(max_dil))
+                shape = shape_dict[max_dil]
+                plt.scatter(x, y, c=[color], marker=shape, s=120, alpha=1.0)
+                if group not in used_dil:
+                    color_legend.append(Line2D([0], [0], marker='o', color='w', label=group,
+                                               markerfacecolor=color, markersize=15))
+                    used_dil.append(group)
+                if shape not in used_shapes:
+                    shape_legend.append(Line2D([0], [0], marker=shape, color='w', label=max_dil,
+                                               markerfacecolor='k', markersize=15))
+                    used_shapes.append(shape)
             # plot in log scale
             plt.yscale('log')
             title = "analyte: {}, patient_id: {}".format(analyte, pid)
             plt.title(title)
+            # add the two different legends in, for color and size
+            first_legend = plt.legend(handles=color_legend, loc='best',
+                                      title='Dilution used')
+            second_legend = plt.legend(handles=shape_legend,
+                                       bbox_to_anchor=(1.00, 0.5),
+                                       title='Max dilution')
+            plt.gca().add_artist(first_legend)
             plt.tight_layout()
-            pp.savefig(f)
+            pp.savefig(f, bbox_extra_artists=[first_legend, second_legend], bbox_inches='tight')
         pp.close()
 
 
