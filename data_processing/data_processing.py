@@ -10,42 +10,12 @@ from data_processing.data_processing_helpers import (run_compare, return_decisio
 from data_processing.data_processing_helpers import THRESHOLDS
 
 
-def main():
-    dfs = []
-    input_path = 'C:/Users/lzoeckler/Desktop/4plex/input_data/20190610'
-    for fname in os.listdir(input_path):
-        plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
-                                skiprows=8, names=['patient_id', 'type', 'well', 'error',
-                                                   'HRP2_pg_ml', 'LDH_Pan_pg_ml',
-                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml'])
-        plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
-        plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
-        plex_data = plex_data[~plex_data['patient_id'].isnull()]
-        dfs.append(plex_data)
-    samples_data = pd.concat(dfs)
-    # subset data to just what we want
-    samples_data = samples_data.loc[~samples_data['type'].isnull()]
-    samples_data = samples_data.loc[~samples_data['type'].str.contains('pixel')]
-    samples_data = samples_data.loc[samples_data['patient_id'].str.contains('pa-')]
-    samples_data = samples_data.drop('type', axis=1)
-    # break out concentratino from patient string
-    samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[-1])
-    samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[0])
-    samples_data = samples_data.loc[
-        (samples_data['concentration'].str.contains('neat|50'))]
-    samples_data = samples_data.loc[~samples_data['concentration'].str.contains('low volume')]
-    samples_data = samples_data.loc[~samples_data['well'].isnull()]
-    # fix concentrations
-    samples_data['concentration'] = samples_data.apply(fix_concentrations, axis=1)
-    samples_data = samples_data.sort_values(['patient_id', 'well'])
-
-    # subset the data to just duplicates
-    duplicates = samples_data.loc[samples_data.duplicated(subset=['patient_id', 'concentration'], keep=False)]
+def deduplicate(duplicate_df):
     deduped_dfs = []
     for analyte in THRESHOLDS.keys():
-        dup_analyte = duplicates[['patient_id', 'well', 'error', 'concentration', analyte]]
+        dup_analyte = duplicate_df[['patient_id', 'well', 'error', 'concentration', analyte]]
         pid_dfs = []
-        for pid in duplicates['patient_id'].unique():
+        for pid in duplicate_df['patient_id'].unique():
             dup_data = dup_analyte.loc[dup_analyte['patient_id'] == pid]
             con_dfs = []
             for concentration in dup_data['concentration'].unique():
@@ -86,18 +56,18 @@ def main():
         deduped_dfs.append(pid_df)
     deduped = reduce(lambda left, right: pd.merge(left, right, on=['patient_id', 'well', 'error', 'concentration']),
                      deduped_dfs)
-    # replace old duplicated values with new dedeuplicated values
-    no_duplicates = samples_data.drop_duplicates(subset=['patient_id', 'concentration'], keep=False)
-    no_duplicates = pd.concat([no_duplicates, deduped])
+    return deduped
 
+
+def decider(base_df):
     # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
     # run counts for decision on what to keep
     for analyte in THRESHOLDS.keys():
         patient_dfs = []
         # iterate over patient_ids
-        for i in samples_data['patient_id'].unique():
-            patient_data = no_duplicates.loc[no_duplicates['patient_id'] == i]
+        for i in base_df['patient_id'].unique():
+            patient_data = base_df.loc[base_df['patient_id'] == i]
             # get number of dilutions
             dilution_values = sorted([val for val in patient_data['concentration'].unique() if val != '1'], key=len)
             # set initial best decision to neat (1)
@@ -150,7 +120,46 @@ def main():
         patient_df = pd.concat(patient_dfs)
         patient_df['errors'] = patient_df['errors'].astype('object')
         analyte_dfs.append(patient_df)
-    output_df = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    decided = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    return decided
+
+
+def main():
+    dfs = []
+    input_path = 'C:/Users/lzoeckler/Desktop/4plex/input_data/20190610'
+    for fname in os.listdir(input_path):
+        plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
+                                skiprows=8, names=['patient_id', 'type', 'well', 'error',
+                                                   'HRP2_pg_ml', 'LDH_Pan_pg_ml',
+                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml'])
+        plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+        plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
+        plex_data = plex_data[~plex_data['patient_id'].isnull()]
+        dfs.append(plex_data)
+    samples_data = pd.concat(dfs)
+    # subset data to just what we want
+    samples_data = samples_data.loc[~samples_data['type'].isnull()]
+    samples_data = samples_data.loc[~samples_data['type'].str.contains('pixel')]
+    samples_data = samples_data.loc[samples_data['patient_id'].str.contains('pa-')]
+    samples_data = samples_data.drop('type', axis=1)
+    # break out concentration from patient string
+    samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[-1])
+    samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[0])
+    samples_data = samples_data.loc[(samples_data['concentration'].str.contains('neat|50'))]
+    samples_data = samples_data.loc[~samples_data['concentration'].str.contains('low volume')]
+    samples_data = samples_data.loc[~samples_data['well'].isnull()]
+    # fix concentrations
+    samples_data['concentration'] = samples_data.apply(fix_concentrations, axis=1)
+    samples_data = samples_data.sort_values(['patient_id', 'well'])
+    # subset the data to just duplicates
+    duplicates = samples_data.loc[samples_data.duplicated(subset=['patient_id', 'concentration'], keep=False)]
+    # run deduplicating function, return deduplicated df
+    deduped = deduplicate(duplicates)
+    # replace old duplicated values with new dedeuplicated values
+    no_duplicates = samples_data.drop_duplicates(subset=['patient_id', 'concentration'], keep=False)
+    no_duplicates = pd.concat([no_duplicates, deduped])
+    # run decision function
+    output_df = decider(no_duplicates)
     # split time associated with patient_id into its own column
     output_df['time_point_days'] = output_df.apply(split_time, axis=1)
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
