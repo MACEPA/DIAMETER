@@ -135,10 +135,12 @@ def main():
     input_path = 'C:/Users/lzoeckler/Desktop/4plex/input_data/20190610'
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
-        plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
+        plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
                                 skiprows=8, names=['patient_id', 'type', 'well', 'error',
                                                    'HRP2_pg_ml', 'LDH_Pan_pg_ml',
-                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml'])
+                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml',
+                                                   'fail1', 'fail2'])
+        plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
         plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
         plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
         plex_data = plex_data[~plex_data['patient_id'].isnull()]

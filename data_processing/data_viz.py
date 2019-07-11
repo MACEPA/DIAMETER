@@ -1,17 +1,16 @@
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+from sklearn import linear_model
 from matplotlib.lines import Line2D
+from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
 from data_processing.data_viz_helpers import clean_strings
 
 
-def main():
-    # read in formatted dilution CSV
-    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
-    # set list of analytes for 4plex
-    analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
+def analyte_shapes(main_data, analytes):
     # associate colors and shapes to different dilution values
     all_colors = cm.rainbow(np.linspace(0, 1, 8))
     all_dilutions = ['1', '50', '2500', '125000', '6250000', '312500000', '15625000000', '781250000000']
@@ -85,7 +84,48 @@ def main():
             plt.gca().add_artist(first_legend)
             plt.tight_layout()
             pp.savefig(f, bbox_extra_artists=[first_legend, second_legend], bbox_inches='tight')
+            plt.close()
         pp.close()
+
+
+def analyte_individuals(main_data, analytes):
+    for analyte in analytes:
+        pp = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_all_individuals.pdf'.format(analyte))
+        plot_data = main_data[['patient_id', 'time_point_days', analyte,
+                               '{}_dilution'.format(analyte),
+                               '{}_max_dilution'.format(analyte)]]
+        plot_data[analyte] = plot_data[analyte].apply(clean_strings)
+        plot_data[analyte] = plot_data[analyte].apply(float)
+        plot_data[analyte] = plot_data[analyte].apply(math.log)
+        regr = linear_model.LinearRegression()
+        time = plot_data['time_point_days'].values.reshape(-1, 1)
+        val = plot_data[analyte].values.reshape(-1, 1)
+        regr.fit(time, val)
+        pred = regr.predict(time)
+        score = r2_score(val, pred)
+        coef = np.float(regr.coef_)
+        intercept = np.float(regr.intercept_)
+        f = plt.figure()
+        plt.scatter(time, val)
+        plt.plot(time, pred, color='green')
+        title = """Analyte: {}, Slope: {}, \nIntercept: {}, R2: {}""".format(
+            analyte, round(coef, 8), round(intercept, 8), score)
+        plt.title(title)
+        plt.tight_layout()
+        pp.savefig(f)
+        plt.close()
+        pp.close()
+
+
+def main():
+    # read in formatted dilution CSV
+    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
+    # set list of analytes for 4plex
+    analytes = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
+    # produce analyte shape graphs
+    analyte_shapes(main_data, analytes)
+    # produce analyte individual graphs
+    analyte_individuals(main_data, analytes)
 
 
 if __name__ == '__main__':
