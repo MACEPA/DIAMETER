@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from functools import partial, reduce
-# import helper function
+# import helper functions
 from data_processing.data_processing_helpers import (run_compare, return_decisions,
                                                      fix_concentrations, split_time,
                                                      remove_time)
@@ -13,17 +13,24 @@ from data_processing.data_processing_helpers import THRESHOLDS
 
 # function for combining duplicates
 def deduplicate(duplicate_df):
+    # create an empty list to fill with small dfs, which will be combined
     deduped_dfs = []
+    # iterate over analytes
     for analyte in THRESHOLDS.keys():
+        # subset to columns of interest
         dup_analyte = duplicate_df[['patient_id', 'well', 'error', 'concentration', analyte]]
         pid_dfs = []
+        # iterate over patient_ids
         for pid in duplicate_df['patient_id'].unique():
+            # subset to specific patient_id
             dup_data = dup_analyte.loc[dup_analyte['patient_id'] == pid]
             con_dfs = []
+            # iterate over duplicate concentrations
             for concentration in dup_data['concentration'].unique():
+                # create an empty dataframe to fill
                 fill_df = pd.DataFrame(columns=['patient_id', 'well', 'error',
                                                 'concentration', analyte])
-                # everything until this is subsetting to specific data
+                # subset to specific concentration value
                 dup_con = dup_data.loc[dup_data['concentration'] == concentration]
                 # get the values for the duplicate concentrations
                 values = dup_con[analyte]
@@ -32,15 +39,16 @@ def deduplicate(duplicate_df):
                 wells = ''.join(c for c in str(wells) if c not in ["[", "]", "'"])
                 errors = dup_con['error'].tolist()
                 non_nan_error = [e for e in errors if e is not np.nan]
-                if not non_nan_error:
-                    errors = np.nan
-                else:
+                if non_nan_error:
                     errors = non_nan_error
+                else:
+                    errors = np.nan
                 try:
                     # if they're both real numbers, take the average
                     values = [float(val) for val in values.tolist()]
                     val = sum(values) / len(values)
                 except ValueError:
+                    # otherwise...
                     values = values.tolist()
                     num_vals = [val for val in values if ('<' not in val) & ('>' not in val)]
                     # if one is a real number, take that one
@@ -49,6 +57,7 @@ def deduplicate(duplicate_df):
                     # if both are non-real, we assume they're the same. maybe sketchy?
                     else:
                         val = values[0]
+                # add values to empty dataframe
                 fill_df = fill_df.append({'patient_id': pid, 'well': wells, 'error': errors,
                                           'concentration': concentration, analyte: val}, ignore_index=True)
                 con_dfs.append(fill_df)
@@ -65,7 +74,7 @@ def deduplicate(duplicate_df):
 def decider(base_df):
     # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
-    # run counts for decision on what to keep
+    # iterate over analytes
     for analyte in THRESHOLDS.keys():
         patient_dfs = []
         # iterate over patient_ids
@@ -111,10 +120,14 @@ def decider(base_df):
                     error = 'fail'
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
+                # preserve the unselected dilutions
                 other_dilutions = [val for val in patient_data['concentration'].unique()]
                 other_dilutions = [float(val) for val in other_dilutions if val != 'fail']
+                # preserve the maximum dilution, selected or unselected
                 max_dilution = max(other_dilutions)
+                # preserve the selected dilution
                 df_decision = decision if decision != 'fail' else np.nan
+                # put all preserved/selected values into the empty dataframe
                 best_df = best_df.append({'patient_id': i, 'errors': error, analyte: val,
                                           '{}_dilution'.format(analyte): df_decision,
                                           '{}_well'.format(analyte): well,
@@ -141,9 +154,14 @@ def main(input_dir):
                                                    'HRP2_pg_ml', 'LDH_Pan_pg_ml',
                                                    'LDH_Pv_pg_ml', 'CRP_ng_ml',
                                                    'fail1', 'fail2'])
+        # certain CSVs have empty extra columns when read in for some reason
+        # they need to be labeled and then dropped
         plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
+        # convert all strings to lowercase
         plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+        # fill empty patient_ids from the preceeding patient_id
         plex_data['patient_id'] = plex_data['patient_id'].fillna(method='ffill')
+        # drop patient_ids that are still null
         plex_data = plex_data[~plex_data['patient_id'].isnull()]
         dfs.append(plex_data)
     samples_data = pd.concat(dfs)
@@ -155,10 +173,12 @@ def main(input_dir):
     # break out concentration from patient string
     samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[-1])
     samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[0])
+    # remove concentration values we don't want
     samples_data = samples_data.loc[(samples_data['concentration'].str.contains('neat|50'))]
     samples_data = samples_data.loc[~samples_data['concentration'].str.contains('low volume')]
+    # remove rows where "well" is null
     samples_data = samples_data.loc[~samples_data['well'].isnull()]
-    # fix concentrations
+    # make concentrations more machine/human readable
     samples_data['concentration'] = samples_data.apply(fix_concentrations, axis=1)
     samples_data = samples_data.sort_values(['patient_id', 'concentration'])
     # subset the data to just duplicates

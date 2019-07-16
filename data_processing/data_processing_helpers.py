@@ -25,7 +25,7 @@ def run_compare(df, analyte_val, dil_val):
         return np.array([above, below, llq, ulq, na])
 
 
-# function for returning accurate concentrations from patient string
+# function for cleaning concentration info
 def fix_concentrations(df):
     con = df['concentration'].partition(':')[2]
     con = con.partition(')')[0]
@@ -46,10 +46,10 @@ def return_decisions(low, high, fail='fail'):
                             [fail, high, high, fail, fail]])
 
     other_matrix = np.array([[high, low, low, high, high],
-                               [high, low, low, high, fail],
-                               [high, low, low, fail, fail],
-                               [high, low, fail, high, high],
-                               [fail, low, low, fail, fail]])
+                             [high, low, low, high, fail],
+                             [high, low, low, fail, fail],
+                             [high, low, fail, high, high],
+                             [fail, low, low, fail, fail]])
 
     # decisions for various analytes
     decisions = {'HRP2_pg_ml': hrp2_matrix, 'LDH_Pan_pg_ml': other_matrix,
@@ -57,7 +57,7 @@ def return_decisions(low, high, fail='fail'):
     return decisions
 
 
-# function for splitting off time
+# function for splitting off time from patient_id string
 def split_time(df):
     sub = df['patient_id'].split('-')
     try:
@@ -67,7 +67,7 @@ def split_time(df):
         return 0
 
 
-# function for removing time once it's split
+# function for removing time from patient_id string once it's split
 def remove_time(df):
     patient = df['patient_id'].split('-')
     return '{}-{}'.format(patient[0], patient[1])
