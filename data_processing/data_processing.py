@@ -160,7 +160,7 @@ def main(input_dir):
     samples_data = samples_data.loc[~samples_data['well'].isnull()]
     # fix concentrations
     samples_data['concentration'] = samples_data.apply(fix_concentrations, axis=1)
-    samples_data = samples_data.sort_values(['patient_id', 'well'])
+    samples_data = samples_data.sort_values(['patient_id', 'concentration'])
     # subset the data to just duplicates
     duplicates = samples_data.loc[samples_data.duplicated(subset=['patient_id', 'concentration'], keep=False)]
     # run deduplicating function, return deduplicated df
@@ -177,7 +177,13 @@ def main(input_dir):
     output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
     output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
     output_df.to_csv('{}/output_data/final_dilutions.csv'.format(input_dir))
-    return output_df
+    # also output a csv of partially formatted data, for vetting
+    partial_format = samples_data.copy(deep=True)
+    partial_format['time_point_days'] = partial_format.apply(split_time, axis=1)
+    partial_format['patient_id'] = partial_format.apply(remove_time, axis=1)
+    partial_format.sort_values(['patient_id', 'time_point_days'], inplace=True)
+    partial_format.set_index(['patient_id', 'time_point_days'], inplace=True)
+    partial_format.to_csv('{}/output_data/partially_formatted.csv'.format(input_dir))
 
 
 if __name__ == '__main__':
