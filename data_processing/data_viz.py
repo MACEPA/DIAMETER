@@ -1,4 +1,5 @@
 import math
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -85,19 +86,19 @@ def analyte_point_individuals(main_data, analyte, analyte_name):
     output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
     pp = PdfPages('{}/{}_all_individuals.pdf'.format(output_fp, analyte))
     # subset data to analyte of interest
-    plot_data = main_data[['patient_id', 'time_point_days', analyte,
+    point_data = main_data[['patient_id', 'time_point_days', analyte,
                            '{}_dilution'.format(analyte),
                            '{}_max_dilution'.format(analyte)]]
     # clean strings to remove '>'/'<', convert 'fail' to NaN
-    plot_data[analyte] = plot_data[analyte].apply(clean_strings)
+    point_data[analyte] = point_data[analyte].apply(clean_strings)
     # convert strings to float
-    plot_data[analyte] = plot_data[analyte].apply(float)
+    point_data[analyte] = point_data[analyte].apply(float)
     # take log of the floats
-    plot_data[analyte] = plot_data[analyte].apply(math.log)
+    point_data[analyte] = point_data[analyte].apply(math.log)
     # run a simple linear regression on the logged data
     regr = linear_model.LinearRegression()
-    time = plot_data['time_point_days'].values.reshape(-1, 1)
-    val = plot_data[analyte].values.reshape(-1, 1)
+    time = point_data['time_point_days'].values.reshape(-1, 1)
+    val = point_data[analyte].values.reshape(-1, 1)
     regr.fit(time, val)
     pred = regr.predict(time)
     # return the R2 value, the slope, and the interecpt of the model
@@ -155,7 +156,7 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def main():
+def main(run_shapes, run_points, run_connected):
     # read in formatted dilution CSV
     input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
     main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_fp))
@@ -163,12 +164,23 @@ def main():
     for analyte in ANALYTE_INFO.keys():
         analyte_name = ANALYTE_INFO[analyte]
         # produce analyte shape graphs
-        analyte_shapes(main_data, analyte, analyte_name)
+        if run_shapes:
+            analyte_shapes(main_data, analyte, analyte_name)
         # produce analyte individual graphs with trend lines, unconnected
-        analyte_point_individuals(main_data, analyte, analyte_name)
+        if run_points:
+            analyte_point_individuals(main_data, analyte, analyte_name)
         # produce analyte individual graphs without trend lines, connected
-        analyte_connected_individuals(main_data, analyte, analyte_name)
+        if run_connected:
+            analyte_connected_individuals(main_data, analyte, analyte_name)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-rs', '--run_shapes', action='store_true',
+                        help='Whether or not to produce shape graphs')
+    parser.add_argument('-rp', '--run_points', action='store_true',
+                        help='Whether or not to produce point graphs')
+    parser.add_argument('-rc', '--run_connected', action='store_true',
+                        help='Whether or not to produce connected graphs')
+    args = parser.parse_args()
+    main(run_shapes=args.rs, run_points=args.rp, run_connected=args.rc)

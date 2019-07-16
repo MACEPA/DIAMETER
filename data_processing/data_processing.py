@@ -1,6 +1,7 @@
 import os
-import pandas as pd
+import argparse
 import numpy as np
+import pandas as pd
 from functools import partial, reduce
 # import helper function
 from data_processing.data_processing_helpers import (run_compare, return_decisions,
@@ -130,9 +131,9 @@ def decider(base_df):
     return decided
 
 
-def main():
+def main(input_dir):
     dfs = []
-    input_path = 'C:/Users/lzoeckler/Desktop/4plex/input_data/20190610'
+    input_path = '/input_data/20190610'.format(input_dir)
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
         plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
@@ -175,9 +176,14 @@ def main():
     # sort values and output to a csv
     output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
     output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
-    output_df.to_csv('C:/Users/lzoeckler/Desktop/4plex/output_data/final_dilutions.csv')
+    output_df.to_csv('{}/output_data/final_dilutions.csv'.format(input_dir))
     return output_df
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-id', '--input_dir', type=str,
+                        default='C:/Users/lzoeckler/Desktop/4plex',
+                        help='Input directory')
+    args = parser.parse_args()
+    main(input_dir=args.id)
