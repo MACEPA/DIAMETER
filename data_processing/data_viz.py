@@ -87,8 +87,8 @@ def analyte_point_individuals(main_data, analyte, analyte_name):
     pp = PdfPages('{}/{}_all_individuals.pdf'.format(output_fp, analyte))
     # subset data to analyte of interest
     point_data = main_data[['patient_id', 'time_point_days', analyte,
-                           '{}_dilution'.format(analyte),
-                           '{}_max_dilution'.format(analyte)]]
+                            '{}_dilution'.format(analyte),
+                            '{}_max_dilution'.format(analyte)]]
     # clean strings to remove '>'/'<', convert 'fail' to NaN
     point_data[analyte] = point_data[analyte].apply(clean_strings)
     # convert strings to float
@@ -156,7 +156,71 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def main(run_shapes, run_points, run_connected):
+def hrp2_grouping(main_data, analyte, analyte_name):
+    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
+    pp = PdfPages('{}/{}_manual_groups.pdf'.format(output_fp, analyte))
+    for pid in main_data['patient_id'].unique():
+        # subset data to individual patient_id, only HRP2 data
+        pid_data = main_data.loc[main_data['patient_id'] == pid]
+        plot_data = pid_data[['patient_id', 'time_point_days', analyte,
+                              '{}_dilution'.format(analyte),
+                              '{}_max_dilution'.format(analyte)]]
+        # clean strings to remove '>'/'<', convert 'fail' to NaN
+        plot_data[analyte] = plot_data[analyte].apply(clean_strings)
+        # convert strings to float
+        plot_data[analyte] = plot_data[analyte].apply(float)
+        # get all distinct time point values
+        first_days = plot_data['time_point_days'].unique().tolist()
+        first_days.sort()
+        # save the first three time point values
+        first_days = first_days[:3]
+        # save the initial time point value
+        day_zero = first_days[0]
+        # save the inital analyte value, at the initial time point value
+        initial_pg = plot_data.loc[plot_data['time_point_days'] == day_zero, analyte].item()
+        # take log of the floats
+        plot_data[analyte] = plot_data[analyte].apply(math.log)
+        # plot each patient_id separately
+        f = plt.figure()
+        f.add_subplot()
+        # logic for splitting into groups, default group is blue
+        plt_color = 'blue'
+        # if initial value too small set group to black
+        if initial_pg < 10:
+            plt_color = 'black'
+        # otherwise...
+        else:
+            early_values = plot_data.loc[plot_data['time_point_days'].isin(first_days)]
+            # save the mean of the first three time point values
+            mean_val = early_values[analyte].mean()
+            # exclude the first three time point values from testing
+            sub_plot = plot_data.loc[~plot_data['time_point_days'].isin(first_days)]
+            sub_val = sub_plot[analyte].values
+            for i in range(len(sub_val)):
+                try:
+                    if mean_val < sub_val[i]:
+                        if abs(sub_val[i + 1] - sub_val[i - 1]) > (.01 * sub_val[i - 1]):
+                            if (sub_val[i] - mean_val) > (.01 * mean_val):
+                                if sub_val[i + 1] > .9 * mean_val:
+                                    plt_color = 'red'
+                except IndexError:
+                    pass
+        plt.plot(plot_data['time_point_days'], plot_data[analyte],
+                 color=plt_color)
+        # label the plot and the axes
+        true_analyte = analyte_name[0]
+        units = analyte_name[1]
+        title = "Analyte: {}, Patient_id: {}".format(true_analyte, pid)
+        plt.xlabel("Timepoint, in days")
+        plt.ylabel("Log of analyte value, {}".format(units))
+        plt.title(title)
+        plt.tight_layout()
+        pp.savefig(f)
+        plt.close()
+    pp.close()
+
+
+def main(run_shapes, run_points, run_connected, run_hrp2):
     # read in formatted dilution CSV
     input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
     main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_fp))
@@ -172,6 +236,9 @@ def main(run_shapes, run_points, run_connected):
         # produce analyte individual graphs without trend lines, connected
         if run_connected:
             analyte_connected_individuals(main_data, analyte, analyte_name)
+        # produce HRP2 groups
+        if run_hrp2 and (analyte == 'HRP2_pg_ml'):
+            hrp2_grouping(main_data, analyte, analyte_name)
 
 
 if __name__ == '__main__':
@@ -182,5 +249,7 @@ if __name__ == '__main__':
                         help='Whether or not to produce point graphs')
     parser.add_argument('-rc', '--run_connected', action='store_true',
                         help='Whether or not to produce connected graphs')
+    parser.add_argument('-rh', '--run_hrp2', action='store_true',
+                        help='Whether or not to produce HRP2 grouping graphs')
     args = parser.parse_args()
-    main(run_shapes=args.rs, run_points=args.rp, run_connected=args.rc)
+    main(run_shapes=args.rs, run_points=args.rp, run_connected=args.rc, run_hrp2=args.rh)
