@@ -196,6 +196,15 @@ def hrp2_grouping(main_data, analyte, analyte_name):
             # exclude the first three time point values from testing
             sub_plot = plot_data.loc[~plot_data['time_point_days'].isin(first_days)]
             sub_val = sub_plot[analyte].values
+            # For each time point beyond the third in a given sample:
+            # 1) If the value at that point is greater than the mean of the values at the first three time points and
+            # 2) If the difference between the immediately preceding value and the immediately following value is
+            # greater than 1% of the preceding value and
+            # 3) If the difference between the value and the mean of the values at the first three time points is
+            # greater than 1% of that mean and
+            # 4) If the immediately following value is greater than 90% of the mean of the values at the first three
+            # time points, then
+            # 5) The patient ID is set to group red
             for i in range(len(sub_val)):
                 try:
                     if mean_val < sub_val[i]:
@@ -205,6 +214,7 @@ def hrp2_grouping(main_data, analyte, analyte_name):
                                     plt_color = 'red'
                 except IndexError:
                     pass
+        # plot the data with the selected group expressed as plot color
         plt.plot(plot_data['time_point_days'], plot_data[analyte],
                  color=plt_color)
         # label the plot and the axes
