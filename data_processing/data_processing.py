@@ -117,7 +117,7 @@ def decider(base_df):
                 elif decision == 'fail':
                     val = 'fail'
                     well = 'fail'
-                    error = 'fail'
+                    error = np.nan
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
                 # preserve the unselected dilutions

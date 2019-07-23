@@ -24,6 +24,7 @@ def analyte_shapes(main_data, analyte, analyte_name):
                               '{}_max_dilution'.format(analyte)]]
         plot_data[analyte] = plot_data[analyte].apply(clean_strings)
         plot_data[analyte] = plot_data[analyte].apply(float)
+        plot_data = plot_data.loc[~plot_data[analyte].isnull()]
         vals = plot_data[analyte].tolist()
         # try to captures "interesting" graphs with a red color
         try:
@@ -38,6 +39,8 @@ def analyte_shapes(main_data, analyte, analyte_name):
         # line plot with "interest" color
         plt.plot(plot_data['time_point_days'], plot_data[analyte], color=plt_color, alpha=0.3)
         dil_vals = plot_data['{}_dilution'.format(analyte)].tolist()
+        dil_vals = [val for val in dil_vals if not np.isnan(val)]
+        dil_vals = [int(val) if not np.isnan(val) else val for val in dil_vals]
         dil_vals = [str(val) if val != 'fail' else val for val in dil_vals]
         vals = plot_data[analyte].tolist()
         time = plot_data['time_point_days'].tolist()
@@ -95,6 +98,8 @@ def analyte_point_individuals(main_data, analyte, analyte_name):
     point_data[analyte] = point_data[analyte].apply(float)
     # take log of the floats
     point_data[analyte] = point_data[analyte].apply(math.log)
+    # only keep non-null values
+    point_data = point_data.loc[~point_data[analyte].isnull()]
     # run a simple linear regression on the logged data
     regr = linear_model.LinearRegression()
     time = point_data['time_point_days'].values.reshape(-1, 1)
@@ -143,6 +148,10 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
         plot_data[analyte] = plot_data[analyte].apply(float)
         # take log of the floats
         plot_data[analyte] = plot_data[analyte].apply(math.log)
+        # only keep non-null values
+        plot_data = plot_data.loc[~plot_data[analyte].isnull()]
+        # plot the individual
+        plt.plot(plot_data['time_point_days'], plot_data[analyte])
     # label the plot and the axes
     true_analyte = analyte_name[0]
     units = analyte_name[1]
@@ -169,6 +178,8 @@ def hrp2_grouping(main_data, analyte, analyte_name):
         plot_data[analyte] = plot_data[analyte].apply(clean_strings)
         # convert strings to float
         plot_data[analyte] = plot_data[analyte].apply(float)
+        # only keep non-null values
+        plot_data = plot_data.loc[~plot_data[analyte].isnull()]
         # get all distinct time point values
         first_days = plot_data['time_point_days'].unique().tolist()
         first_days.sort()
