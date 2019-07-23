@@ -212,8 +212,8 @@ def hrp2_grouping(main_data, analyte, analyte_name):
             # 2) If the immediately following value is greater than 80% of the mean of the values at the first three
             # time points and
             # 3) If the difference between the value and the mean of the values at the first three time points is
-            # greater than 1% of that mean and
-            # 4) The patient ID is set to group red
+            # greater than 1% of that mean
+            # Then the patient ID is set to group red
             for i in range(len(sub_val)):
                 try:
                     if mean_val < sub_val[i]:
