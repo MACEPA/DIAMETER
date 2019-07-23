@@ -227,7 +227,7 @@ def hrp2_grouping(main_data, analyte, analyte_name):
                         cond2 = sub_val[i + 1] > .8 * mean_val
                         if cond1 or cond2:
                             if (sub_val[i] - mean_val) > (.01 * mean_val):
-                                if sub_val[i + 1] > .9 * mean_val:
+                                if sub_val[i + 1] > .8 * mean_val:
                                     plt_color = 'red'
                 except IndexError:
                     pass
