@@ -78,8 +78,8 @@ def decider(base_df):
     for analyte in THRESHOLDS.keys():
         patient_dfs = []
         # iterate over patient_ids
-        for i in base_df['patient_id'].unique():
-            patient_data = base_df.loc[base_df['patient_id'] == i]
+        for pid in base_df['patient_id'].unique():
+            patient_data = base_df.loc[base_df['patient_id'] == pid]
             # get number of dilutions
             dilution_values = sorted([val for val in patient_data['concentration'].unique() if val != '1'], key=len)
             # set initial best decision to neat (1)
@@ -128,7 +128,7 @@ def decider(base_df):
                 # preserve the selected dilution
                 df_decision = decision if decision != 'fail' else np.nan
                 # put all preserved/selected values into the empty dataframe
-                best_df = best_df.append({'patient_id': i, 'errors': error, analyte: val,
+                best_df = best_df.append({'patient_id': pid, 'errors': error, analyte: val,
                                           '{}_dilution'.format(analyte): df_decision,
                                           '{}_well'.format(analyte): well,
                                           '{}_max_dilution'.format(analyte): max_dilution}, ignore_index=True)
