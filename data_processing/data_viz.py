@@ -7,7 +7,9 @@ from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
-from data_processing.data_viz_helpers import clean_strings
+from data_processing.data_viz_helpers import (clean_strings,
+                                              hrp2_complex_grouping,
+                                              hrp2_ratio_grouping)
 from data_processing.data_viz_helpers import (COLOR_DICT, SHAPE_DICT,
                                               ANALYTE_INFO)
 
@@ -165,112 +167,6 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def get_coef(df):
-    regr = linear_model.LinearRegression()
-    time = df['time_point_days'].values.reshape(-1,1)
-    val = df['HRP2_pg_ml'].values.reshape(-1,1)
-    regr.fit(time, val)
-    coef = np.float(regr.coef_)
-    pred = regr.predict(time)
-    score = r2_score(val, pred)
-    return coef, score
-
-
-def hrp2_complex_grouping(main_data):
-    # run HRP2 grouping
-    good_df = []
-    bad_df = []
-    for pid in main_data['patient_id'].unique():
-        # subset data to individual patient_id, only HRP2 data
-        pid_data = main_data.loc[main_data['patient_id'] == pid]
-        all_times = pid_data['time_point_days'].unique().tolist()
-        all_times.sort()
-        max_run = 3
-        the_rest = []
-        i = 0
-        end_val = 4
-        baddest_section = []
-        the_rest_set = set([0])
-        while (end_val <= len(all_times)) & (len(the_rest_set) != 0):
-            next_start = None
-            time_vals = all_times[i:end_val]
-            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
-            avg_val = coef_data['HRP2_pg_ml'].mean()
-            coef, score = get_coef(coef_data)
-            extended_time = all_times[end_val:end_val + 4]
-        if len(extended_time) > 2:
-            extended_data = pid_data.loc[pid_data['time_point_days'].isin(extended_time)]
-            extended_coef, extended_score = get_coef(extended_data)
-        else:
-            extended_score = 0
-        while (coef > -.03) & (len(time_vals) != 1) & (avg_val > 2.5) & (end_val < len(all_times)):
-            end_val = end_val + 1
-            time_vals = all_times[i:end_val]
-            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
-            coef, score = get_coef(coef_data)
-            avg_val = coef_data['HRP2_pg_ml'].mean()
-            end_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals[-4:])]
-            end_coef, end_score = get_coef(end_data)
-            extended_time = all_times[end_val:end_val + 4]
-            condition1 = (coef > -.03) & (avg_val > 2.5) & (score < .3) & (end_score < .4)
-            condition2 = (coef > 0) & (avg_val > 2.5) & (score < .3)
-            if condition1 or condition2:
-                current_run = len(time_vals)
-                next_start = end_val - 1
-                if current_run > max_run:
-                    max_run = current_run
-                    baddest_section = time_vals
-        if next_start:
-            i = next_start
-        else:
-            i = end_val - 3
-        try:
-            all_times[i + 4]
-            end_val = i + 4
-        except IndexError:
-            the_rest = all_times[i:]
-            the_rest_set = set(the_rest) - set(time_vals)
-            end_val = i + len(the_rest)
-        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(baddest_section)]
-        good_df.append(good_vals)
-        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(baddest_section)]
-        bad_df.append(bad_vals)
-    good_df = pd.concat(good_df)
-    bad_df = pd.concat(bad_df)
-    good_df['group'] = 'blue'
-    bad_df['group'] = 'red'
-    combo_df = pd.concat([good_df, bad_df])
-    return combo_df
-
-
-def hrp2_ratio_grouping(main_data):
-    good_df = []
-    bad_df = []
-    for pid in main_data['patient_id'].unique():
-        bad_days = []
-        pid_data = main_data.loc[main_data['patient_id'] == pid]
-        pid_data.sort_values('time_point_days', inplace=True)
-        all_times = pid_data['time_point_days'].unique().tolist()
-        all_times.sort()
-        for day in all_times:
-            day_df = pid_data.loc[pid_data['time_point_days'] == day]
-            day_df['ratio'] = day_df['LDH_Pan_pg_ml'].divide(day_df['HRP2_pg_ml'])
-            if (day_df['ratio'].item() > .8) & (day_df['HRP2_pg_ml'].item() > 4):
-                bad_days.append(day)
-        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(bad_days)]
-        good_df.append(good_vals)
-        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(bad_days)]
-        bad_df.append(bad_vals)
-    good_df = pd.concat(good_df)
-    bad_df = pd.concat(bad_df)
-    good_df['group'] = 'blue'
-    good_df['ratio'] = good_df['LDH_Pan_pg_ml'].divide(good_df['HRP2_pg_ml'])
-    bad_df['group'] = 'red'
-    bad_df['ratio'] = bad_df['LDH_Pan_pg_ml'].divide(bad_df['HRP2_pg_ml'])
-    combo_df = pd.concat([good_df, bad_df])
-    return combo_df
-
-
 def plot_hrp2_groups(main_data, version):
     output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
     pp = PdfPages('{}/HRP2_{}_groups.pdf'.format(output_fp, version))
@@ -314,6 +210,42 @@ def rebuild_data(main_data, val_cols):
     return rebuilt_data
 
 
+def plot_zero_density(main_data):
+    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
+    density = PdfPages('{}/time_point_density_with_zero.pdf'.format(output_fp))
+    good_zero = main_data.loc[main_data['group'] == 'blue']
+    good_zero.rename({'time_point_days': 'Group 1 days'}, axis=1, inplace=True)
+    good_zero['Group 1 days'].plot.kde()
+    bad_zero = main_data.loc[main_data['group'] == 'red']
+    bad_zero.rename({'time_point_days': 'Group 2 days'}, axis=1, inplace=True)
+    bad_zero['Group 2 days'].plot.kde()
+    plt.legend()
+    plt.title('Density plot for group 1 vs group 2 days')
+    plt.tight_layout()
+    density.savefig()
+    plt.close()
+    density.close()
+
+
+def plot_nonzero_density(main_data):
+    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
+    density = PdfPages('{}/time_point_density_without_zero.pdf'.format(output_fp))
+    good_no_zero = main_data.loc[main_data['group'] == 'blue']
+    good_no_zero = good_no_zero.loc[good_no_zero['time_point_days'] != 0]
+    good_no_zero.rename({'time_point_days': 'Group 1 days'}, axis=1, inplace=True)
+    good_no_zero['Group 1 days'].plot.kde()
+    bad_no_zero = main_data.loc[main_data['group'] == 'red']
+    bad_no_zero = bad_no_zero.loc[bad_no_zero['time_point_days'] != 0]
+    bad_no_zero.rename({'time_point_days': 'Group 2 days'}, axis=1, inplace=True)
+    bad_no_zero['Group 2 days'].plot.kde()
+    plt.legend()
+    plt.title('Density plot for group 1 vs group 2 days\n(does not include day 0)')
+    plt.tight_layout()
+    density.savefig()
+    plt.close()
+    density.close()
+
+
 def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2):
     # read in formatted dilution CSV
     input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
@@ -340,6 +272,8 @@ def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2
         if run_ratio_hrp2:
             grouped_data = hrp2_ratio_grouping(rebuilt_data)
             plot_hrp2_groups(grouped_data)
+            plot_zero_density(grouped_data)
+            plot_nonzero_density(grouped_data)
 
 
 if __name__ == '__main__':
