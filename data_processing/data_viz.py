@@ -249,6 +249,7 @@ def plot_nonzero_density(main_data):
 def plot_all_points_analytes(main_data, version):
     ratios = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_good_vs_bad_points.pdf'.format(version))
     pairs = [('HRP2_pg_ml', 'LDH_Pan_pg_ml'), ('HRP2_pg_ml', 'CRP_ng_ml'), ('LDH_Pan_pg_ml', 'CRP_ng_ml')]
+    x = np.linspace(0, 10, 1000)
     for pair in pairs:
         name1 = ANALYTE_INFO[pair[0]][0]
         name2 = ANALYTE_INFO[pair[1]][0]
@@ -264,11 +265,10 @@ def plot_all_points_analytes(main_data, version):
         f.add_subplot()
         # good info
         good_df = main_data.loc[main_data['group'] == 'blue']
-        time, pred, coef = run_model(good_df, pair)
-        title = '"Good" points\nk = {}'.format(round(coef, 4))
+        title = '"Good" points'
         plt.subplot(1, 2, 1)
         plt.scatter(good_df[pair[0]], good_df[pair[1]], color=good_df['group'], alpha=0.6)
-        plt.plot(time, pred, color='black')
+        plt.plot(x, x, color='black')
         plt.title(title)
         plt.xlim(xlim)
         plt.ylim(ylim)
@@ -277,11 +277,10 @@ def plot_all_points_analytes(main_data, version):
         plt.tight_layout()
         # bad info
         bad_df = main_data.loc[main_data['group'] == 'red']
-        time, pred, coef = run_model(bad_df, pair)
-        title = '"Bad" points\nk = {}'.format(round(coef, 4))
+        title = '"Bad" points'
         plt.subplot(1, 2, 2)
         plt.scatter(bad_df[pair[0]], bad_df[pair[1]], color=bad_df['group'], alpha=0.6)
-        plt.plot(time, pred, color='black')
+        plt.plot(x, x, color='black')
         plt.title(title)
         plt.xlim(xlim)
         plt.ylim(ylim)

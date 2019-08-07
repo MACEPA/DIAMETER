@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/sub_group_graphs-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/sub_group_graphs-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/data_viz.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_viz.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/data_viz_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_viz_helpers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/sub_group_graphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/sub_group_graphs.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -42,8 +39,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-140">
-              <caret line="282" column="74" selection-start-line="282" selection-start-column="74" selection-end-line="282" selection-end-column="74" />
+            <state relative-caret-position="901">
+              <caret line="278" column="59" lean-forward="true" selection-start-line="278" selection-start-column="59" selection-end-line="278" selection-end-column="59" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -285,8 +282,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-140">
-          <caret line="282" column="74" selection-start-line="282" selection-start-column="74" selection-end-line="282" selection-end-column="74" />
+        <state relative-caret-position="901">
+          <caret line="278" column="59" lean-forward="true" selection-start-line="278" selection-start-column="59" selection-end-line="278" selection-end-column="59" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
