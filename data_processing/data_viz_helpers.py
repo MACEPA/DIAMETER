@@ -25,6 +25,22 @@ def get_coef(df):
     return coef, score
 
 
+def run_model(df, pair):
+    regr = linear_model.LinearRegression()
+    time = df[pair[0]].values.reshape(-1,1)
+    val = df[pair[1]].values.reshape(-1,1)
+    try:
+        regr.fit(time, val)
+    except ValueError:
+        plot_df = df.dropna()
+        time = plot_df[pair[0]].values.reshape(-1,1)
+        val = plot_df[pair[1]].values.reshape(-1,1)
+        regr.fit(time, val)
+    pred = regr.predict(time)
+    coef = np.float(regr.coef_)
+    return time, pred, coef
+
+
 def hrp2_complex_grouping(main_data):
     # run HRP2 grouping
     good_df = []

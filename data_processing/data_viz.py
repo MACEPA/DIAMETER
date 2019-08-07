@@ -7,7 +7,7 @@ from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
-from data_processing.data_viz_helpers import (clean_strings,
+from data_processing.data_viz_helpers import (clean_strings, run_model,
                                               hrp2_complex_grouping,
                                               hrp2_ratio_grouping)
 from data_processing.data_viz_helpers import (COLOR_DICT, SHAPE_DICT,
@@ -246,6 +246,53 @@ def plot_nonzero_density(main_data):
     density.close()
 
 
+def plot_all_points_analytes(main_data, version):
+    ratios = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_good_vs_bad_points.pdf'.format(version))
+    pairs = [('HRP2_pg_ml', 'LDH_Pan_pg_ml'), ('HRP2_pg_ml', 'CRP_ng_ml'), ('LDH_Pan_pg_ml', 'CRP_ng_ml')]
+    for pair in pairs:
+        name1 = ANALYTE_INFO[pair[0]][0]
+        name2 = ANALYTE_INFO[pair[1]][0]
+        if pair == pairs[0]:
+            ylim = (1, 9)
+        else:
+            ylim = (1.4, 6)
+        if pair == pairs[2]:
+            xlim = (1, 9)
+        else:
+            xlim = (0, 11)
+        f = plt.figure()
+        f.add_subplot()
+        # good info
+        good_df = main_data.loc[main_data['group'] == 'blue']
+        time, pred, coef = run_model(good_df, pair)
+        title = '"Good" points\nk = {}'.format(round(coef, 4))
+        plt.subplot(1, 2, 1)
+        plt.scatter(good_df[pair[0]], good_df[pair[1]], color=good_df['group'], alpha=0.6)
+        plt.plot(time, pred, color='black')
+        plt.title(title)
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        plt.xlabel(name1)
+        plt.ylabel(name2)
+        plt.tight_layout()
+        # bad info
+        bad_df = main_data.loc[main_data['group'] == 'red']
+        time, pred, coef = run_model(bad_df, pair)
+        title = '"Bad" points\nk = {}'.format(round(coef, 4))
+        plt.subplot(1, 2, 2)
+        plt.scatter(bad_df[pair[0]], bad_df[pair[1]], color=bad_df['group'], alpha=0.6)
+        plt.plot(time, pred, color='black')
+        plt.title(title)
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        plt.xlabel(name1)
+        plt.tight_layout()
+        ratios.savefig(f)
+        plt.show()
+        plt.close()
+    ratios.close()
+
+
 def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2):
     # read in formatted dilution CSV
     input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
@@ -268,12 +315,14 @@ def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2
         rebuilt_data = rebuild_data(main_data, val_cols)
         if run_complex_hrp2:
             grouped_data = hrp2_complex_grouping(rebuilt_data)
-            plot_hrp2_groups(grouped_data)
+            plot_hrp2_groups(grouped_data, 'complex')
+            plot_all_points_analytes(grouped_data, 'complex')
         if run_ratio_hrp2:
             grouped_data = hrp2_ratio_grouping(rebuilt_data)
-            plot_hrp2_groups(grouped_data)
+            plot_hrp2_groups(grouped_data, 'ratio_based')
             plot_zero_density(grouped_data)
             plot_nonzero_density(grouped_data)
+            plot_all_points_analytes(grouped_data, 'ratio_based')
 
 
 if __name__ == '__main__':
