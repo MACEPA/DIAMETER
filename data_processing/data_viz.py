@@ -165,78 +165,156 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def hrp2_grouping(main_data, analyte, analyte_name):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/{}_manual_groups.pdf'.format(output_fp, analyte))
+def get_coef(df):
+    regr = linear_model.LinearRegression()
+    time = df['time_point_days'].values.reshape(-1,1)
+    val = df['HRP2_pg_ml'].values.reshape(-1,1)
+    regr.fit(time, val)
+    coef = np.float(regr.coef_)
+    pred = regr.predict(time)
+    score = r2_score(val, pred)
+    return coef, score
+
+
+def hrp2_complex_grouping(main_data):
+    # run HRP2 grouping
+    good_df = []
+    bad_df = []
     for pid in main_data['patient_id'].unique():
         # subset data to individual patient_id, only HRP2 data
         pid_data = main_data.loc[main_data['patient_id'] == pid]
-        plot_data = pid_data[['patient_id', 'time_point_days', analyte,
-                              '{}_dilution'.format(analyte),
-                              '{}_max_dilution'.format(analyte)]]
-        # clean strings to remove '>'/'<', convert 'fail' to NaN
-        plot_data[analyte] = plot_data[analyte].apply(clean_strings)
-        # convert strings to float
-        plot_data[analyte] = plot_data[analyte].apply(float)
-        # only keep non-null values
-        plot_data = plot_data.loc[~plot_data[analyte].isnull()]
-        # get all distinct time point values
-        first_days = plot_data['time_point_days'].unique().tolist()
-        first_days.sort()
-        # save the first three time point values
-        first_days = first_days[:3]
-        # save the initial time point value
-        day_zero = first_days[0]
-        # save the inital analyte value, at the initial time point value
-        initial_pg = plot_data.loc[plot_data['time_point_days'] == day_zero, analyte].item()
-        # take log of the floats
-        plot_data[analyte] = plot_data[analyte].apply(math.log)
-        # plot each patient_id separately
+        all_times = pid_data['time_point_days'].unique().tolist()
+        all_times.sort()
+        max_run = 3
+        the_rest = []
+        i = 0
+        end_val = 4
+        baddest_section = []
+        the_rest_set = set([0])
+        while (end_val <= len(all_times)) & (len(the_rest_set) != 0):
+            next_start = None
+            time_vals = all_times[i:end_val]
+            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
+            avg_val = coef_data['HRP2_pg_ml'].mean()
+            coef, score = get_coef(coef_data)
+            extended_time = all_times[end_val:end_val + 4]
+        if len(extended_time) > 2:
+            extended_data = pid_data.loc[pid_data['time_point_days'].isin(extended_time)]
+            extended_coef, extended_score = get_coef(extended_data)
+        else:
+            extended_score = 0
+        while (coef > -.03) & (len(time_vals) != 1) & (avg_val > 2.5) & (end_val < len(all_times)):
+            end_val = end_val + 1
+            time_vals = all_times[i:end_val]
+            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
+            coef, score = get_coef(coef_data)
+            avg_val = coef_data['HRP2_pg_ml'].mean()
+            end_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals[-4:])]
+            end_coef, end_score = get_coef(end_data)
+            extended_time = all_times[end_val:end_val + 4]
+            condition1 = (coef > -.03) & (avg_val > 2.5) & (score < .3) & (end_score < .4)
+            condition2 = (coef > 0) & (avg_val > 2.5) & (score < .3)
+            if condition1 or condition2:
+                current_run = len(time_vals)
+                next_start = end_val - 1
+                if current_run > max_run:
+                    max_run = current_run
+                    baddest_section = time_vals
+        if next_start:
+            i = next_start
+        else:
+            i = end_val - 3
+        try:
+            all_times[i + 4]
+            end_val = i + 4
+        except IndexError:
+            the_rest = all_times[i:]
+            the_rest_set = set(the_rest) - set(time_vals)
+            end_val = i + len(the_rest)
+        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(baddest_section)]
+        good_df.append(good_vals)
+        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(baddest_section)]
+        bad_df.append(bad_vals)
+    good_df = pd.concat(good_df)
+    bad_df = pd.concat(bad_df)
+    good_df['group'] = 'blue'
+    bad_df['group'] = 'red'
+    combo_df = pd.concat([good_df, bad_df])
+    return combo_df
+
+
+def hrp2_ratio_grouping(main_data):
+    good_df = []
+    bad_df = []
+    for pid in main_data['patient_id'].unique():
+        bad_days = []
+        pid_data = main_data.loc[main_data['patient_id'] == pid]
+        pid_data.sort_values('time_point_days', inplace=True)
+        all_times = pid_data['time_point_days'].unique().tolist()
+        all_times.sort()
+        for day in all_times:
+            day_df = pid_data.loc[pid_data['time_point_days'] == day]
+            day_df['ratio'] = day_df['LDH_Pan_pg_ml'].divide(day_df['HRP2_pg_ml'])
+            if (day_df['ratio'].item() > .8) & (day_df['HRP2_pg_ml'].item() > 4):
+                bad_days.append(day)
+        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(bad_days)]
+        good_df.append(good_vals)
+        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(bad_days)]
+        bad_df.append(bad_vals)
+    good_df = pd.concat(good_df)
+    bad_df = pd.concat(bad_df)
+    good_df['group'] = 'blue'
+    good_df['ratio'] = good_df['LDH_Pan_pg_ml'].divide(good_df['HRP2_pg_ml'])
+    bad_df['group'] = 'red'
+    bad_df['ratio'] = bad_df['LDH_Pan_pg_ml'].divide(bad_df['HRP2_pg_ml'])
+    combo_df = pd.concat([good_df, bad_df])
+    return combo_df
+
+
+def plot_hrp2_groups(main_data, version):
+    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
+    pp = PdfPages('{}/HRP2_{}_groups.pdf'.format(output_fp, version))
+    for pid in main_data['patient_id'].unique():
+        # subset data to individual patient_id, only HRP2 data
+        combo = main_data.loc[main_data['patient_id'] == pid]
+        combo = combo.sort_values('time_point_days')
         f = plt.figure()
         f.add_subplot()
-        # logic for splitting into groups, default group is blue
-        plt_color = 'blue'
-        # if initial value too small set group to black
-        if initial_pg < 10:
-            plt_color = 'black'
-        # otherwise...
-        else:
-            early_values = plot_data.loc[plot_data['time_point_days'].isin(first_days)]
-            # save the mean of the first three time point values
-            mean_val = early_values[analyte].mean()
-            # exclude the first three time point values from testing
-            sub_plot = plot_data.loc[~plot_data['time_point_days'].isin(first_days)]
-            sub_val = sub_plot[analyte].values
-            # For each time point beyond the third in a given sample:
-            # 1) If the value at the given time point minus the mean of the values at the first three time points is
-            # greater than 1% of that mean and
-            # 2) If the immediately following value is greater than 80% of the mean of the values at the first three
-            # time points
-            # Then the patient ID is set to group red
-            for i in range(len(sub_val)):
-                try:
-                    if (sub_val[i] - mean_val) > (.01 * mean_val):
-                        if sub_val[i + 1] > .8 * mean_val:
-                            plt_color = 'red'
-                except IndexError:
-                    pass
-        # plot the data with the selected group expressed as plot color
-        plt.plot(plot_data['time_point_days'], plot_data[analyte],
-                 color=plt_color)
-        # label the plot and the axes
-        true_analyte = analyte_name[0]
-        units = analyte_name[1]
-        title = "Analyte: {}, Patient_id: {}".format(true_analyte, pid)
-        plt.xlabel("Timepoint, in days")
-        plt.ylabel("Log of analyte value, {}".format(units))
+        title = "patient_id: {}".format(pid)
+        plt.plot(combo['time_point_days'], combo['HRP2_pg_ml'],
+                 c='black', alpha=0.6)
+        plt.plot(combo['time_point_days'], combo['LDH_Pan_pg_ml'], c='green', alpha=0.6)
+        plt.scatter(combo['time_point_days'], combo['HRP2_pg_ml'],
+                    c=combo['group'])
         plt.title(title)
+        plt.ylim(0, 8)
+        plt.xlabel('Time point, in days')
+        plt.ylabel('Log of HRP2 pg/ml')
         plt.tight_layout()
         pp.savefig(f)
         plt.close()
     pp.close()
 
 
-def main(run_shapes, run_points, run_connected, run_hrp2):
+def rebuild_data(main_data, val_cols):
+    # create a dataframe with no short timeseries (<4 points) and
+    # no timeseries where HRP2 < 10 initially
+    rebuilt_data = []
+    for pid in main_data['patient_id'].unique():
+        sub_data = main_data.loc[main_data['patient_id'] == pid]
+        if len(sub_data) < 4:
+            continue
+        all_times = sub_data['time_point_days'].unique().tolist()
+        start_val = sub_data.loc[sub_data['time_point_days'] == min(all_times), 'HRP2_pg_ml'].item()
+        if start_val < 10:
+            continue
+        rebuilt_data.append(sub_data)
+    rebuilt_data = pd.concat(rebuilt_data)
+    rebuilt_data[val_cols] = rebuilt_data[val_cols].applymap(np.log10)
+    return rebuilt_data
+
+
+def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2):
     # read in formatted dilution CSV
     input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
     main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_fp))
@@ -253,8 +331,15 @@ def main(run_shapes, run_points, run_connected, run_hrp2):
         if run_connected:
             analyte_connected_individuals(main_data, analyte, analyte_name)
         # produce HRP2 groups
-        if run_hrp2 and (analyte == 'HRP2_pg_ml'):
-            hrp2_grouping(main_data, analyte, analyte_name)
+    if run_complex_hrp2 or run_ratio_hrp2:
+        val_cols = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'CRP_ng_ml']
+        rebuilt_data = rebuild_data(main_data, val_cols)
+        if run_complex_hrp2:
+            grouped_data = hrp2_complex_grouping(rebuilt_data)
+            plot_hrp2_groups(grouped_data)
+        if run_ratio_hrp2:
+            grouped_data = hrp2_ratio_grouping(rebuilt_data)
+            plot_hrp2_groups(grouped_data)
 
 
 if __name__ == '__main__':
