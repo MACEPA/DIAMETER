@@ -14,31 +14,17 @@ def clean_strings(val):
     return clean
 
 
-def get_coef(df):
+# function for running a linear regression on two columns
+# returns the coefficient of the regression and the R2 score
+def get_coef(df, col1, col2):
     regr = linear_model.LinearRegression()
-    time = df['time_point_days'].values.reshape(-1, 1)
-    val = df['HRP2_pg_ml'].values.reshape(-1, 1)
+    time = df[col1].values.reshape(-1, 1)
+    val = df[col2].values.reshape(-1, 1)
     regr.fit(time, val)
     coef = np.float(regr.coef_)
     pred = regr.predict(time)
     score = r2_score(val, pred)
     return coef, score
-
-
-def run_model(df, pair):
-    regr = linear_model.LinearRegression()
-    time = df[pair[0]].values.reshape(-1,1)
-    val = df[pair[1]].values.reshape(-1,1)
-    try:
-        regr.fit(time, val)
-    except ValueError:
-        plot_df = df.dropna()
-        time = plot_df[pair[0]].values.reshape(-1,1)
-        val = plot_df[pair[1]].values.reshape(-1,1)
-        regr.fit(time, val)
-    pred = regr.predict(time)
-    coef = np.float(regr.coef_)
-    return time, pred, coef
 
 
 def hrp2_complex_grouping(main_data):
@@ -51,7 +37,6 @@ def hrp2_complex_grouping(main_data):
         all_times = pid_data['time_point_days'].unique().tolist()
         all_times.sort()
         max_run = 3
-        the_rest = []
         i = 0
         end_val = 4
         baddest_section = []
@@ -61,21 +46,21 @@ def hrp2_complex_grouping(main_data):
             time_vals = all_times[i:end_val]
             coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
             avg_val = coef_data['HRP2_pg_ml'].mean()
-            coef, score = get_coef(coef_data)
+            coef, score = get_coef(coef_data, 'time_point_days', 'HRP2_pg_ml')
             extended_time = all_times[end_val:end_val + 4]
         if len(extended_time) > 2:
             extended_data = pid_data.loc[pid_data['time_point_days'].isin(extended_time)]
-            extended_coef, extended_score = get_coef(extended_data)
+            extended_coef, extended_score = get_coef(extended_data, 'time_point_days', 'HRP2_pg_ml')
         else:
             extended_score = 0
         while (coef > -.03) & (len(time_vals) != 1) & (avg_val > 2.5) & (end_val < len(all_times)):
             end_val = end_val + 1
             time_vals = all_times[i:end_val]
             coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
-            coef, score = get_coef(coef_data)
+            coef, score = get_coef(coef_data, 'time_point_days', 'HRP2_pg_ml')
             avg_val = coef_data['HRP2_pg_ml'].mean()
             end_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals[-4:])]
-            end_coef, end_score = get_coef(end_data)
+            end_coef, end_score = get_coef(end_data, 'time_point_days', 'HRP2_pg_ml')
             extended_time = all_times[end_val:end_val + 4]
             condition1 = (coef > -.03) & (avg_val > 2.5) & (score < .3) & (end_score < .4)
             condition2 = (coef > 0) & (avg_val > 2.5) & (score < .3)

@@ -212,4 +212,4 @@ if __name__ == '__main__':
                         default='C:/Users/lzoeckler/Desktop/4plex',
                         help='Input directory')
     args = parser.parse_args()
-    main(input_dir=args.id)
+    main(input_dir=args.input_dir)
