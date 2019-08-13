@@ -7,11 +7,9 @@ from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
-from data_processing.data_viz_helpers import (clean_strings,
-                                              hrp2_complex_grouping,
-                                              hrp2_ratio_grouping)
-from data_processing.data_viz_helpers import (COLOR_DICT, SHAPE_DICT,
-                                              ANALYTE_INFO)
+from data_viz_helpers import (clean_strings, hrp2_complex_grouping,
+                              hrp2_ratio_grouping)
+from data_viz_helpers import (COLOR_DICT, SHAPE_DICT, ANALYTE_INFO)
 
 
 def analyte_shapes(main_data, analyte, analyte_name):

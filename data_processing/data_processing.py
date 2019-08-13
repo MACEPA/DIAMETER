@@ -4,11 +4,11 @@ import numpy as np
 import pandas as pd
 from functools import partial, reduce
 # import helper functions
-from data_processing.data_processing_helpers import (run_compare, return_decisions,
-                                                     fix_concentrations, split_time,
-                                                     remove_time)
+from data_processing_helpers import (run_compare, return_decisions,
+                                     fix_concentrations, split_time,
+                                     remove_time)
 # import constants
-from data_processing.data_processing_helpers import THRESHOLDS
+from data_processing_helpers import THRESHOLDS
 
 
 # function for combining duplicates
