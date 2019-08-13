@@ -175,22 +175,41 @@ def plot_hrp2_groups(main_data, version):
         combo = main_data.loc[main_data['patient_id'] == pid]
         # sort the days to get rid of weird graphing artifacts
         combo = combo.sort_values('time_point_days')
-        f = plt.figure()
-        f.add_subplot()
+        # fetch the maximum day for help creating threshold lines later
+        max_day = max(combo['time_point_days'])
+        f, ax1 = plt.subplots()
         title = "patient_id: {}".format(pid)
+        ax1.set_title(title)
         # plot the HRP2 against days, the LDH against days, and the different
         # HRP2 points with colors according to group
-        plt.plot(combo['time_point_days'], combo['HRP2_pg_ml'],
-                 c='black', alpha=0.6)
-        plt.plot(combo['time_point_days'], combo['LDH_Pan_pg_ml'], c='green', alpha=0.6)
-        plt.scatter(combo['time_point_days'], combo['HRP2_pg_ml'],
+        ln1 = ax1.plot(combo['time_point_days'], combo['HRP2_pg_ml'],
+                       c='black', alpha=0.6, label='HRP2')
+        ln2 = ax1.plot(combo['time_point_days'], combo['LDH_Pan_pg_ml'], c='green', alpha=0.6,
+                       label='pLDH')
+        ax1.scatter(combo['time_point_days'], combo['HRP2_pg_ml'],
                     c=combo['group'])
-        plt.title(title)
-        # set a standard y limit across all plots
-        plt.ylim(0, 8)
-        plt.xlabel('Time point, in days')
-        plt.ylabel('Log of HRP2 pg/ml')
-        plt.tight_layout()
+        # plot the HRP2 threshold for flagging
+        ln3 = ax1.plot(np.array([0, max_day]), np.array([4, 4]), linestyle='--',
+                       label='HRP2 threshold', alpha=0.6, color='k')
+        ax1.set_xlabel('Time point, in days')
+        ax1.set_ylabel('Log of pg/ml')
+        # clone the y axis for plotting the ratio on a different scale
+        ax2 = ax1.twinx()
+        # set the new y axis label and color
+        ax2.set_ylabel('Ratio of pLDH/HRP2', c='brown')
+        # plot the ratio on the new axis
+        ax2.plot(combo['time_point_days'], combo['ratio'], c='brown', alpha=0.6)
+        ax2.tick_params(axis='y', labelcolor='brown')
+        # plot the ratio threshold for flagging
+        ln4 = ax2.plot(np.array([0, max_day]), np.array([0.8, 0.8]), color='brown',
+                       linestyle='--', label='Ratio threshold', alpha=0.6)
+        # combine all the lines to create a composite legend
+        lns = ln1 + ln2 + ln3 + ln4
+        labs = [l.get_label() for l in lns]
+        # place the legend below the plot
+        ax2.legend(lns, labs, bbox_to_anchor=(.75, -.2), ncol=2)
+        f.tight_layout()
+        # save the plot
         pp.savefig(f)
         plt.close()
     pp.close()
