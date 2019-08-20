@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/data_processing/data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/quansys_data_cleaning-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/.ipynb_checkpoints/quansys_data_cleaning-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/4plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/4plex_data_processing.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/data_viz.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_viz.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/quansys_data_cleaning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/quansys_data_cleaning.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+            <state relative-caret-position="187">
+              <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -40,8 +42,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="19" column="21" lean-forward="true" selection-start-line="19" selection-start-column="21" selection-end-line="19" selection-end-column="21" />
+            <state relative-caret-position="422">
+              <caret line="77" column="14" lean-forward="true" selection-start-line="77" selection-start-column="14" selection-end-line="77" selection-end-column="14" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -79,6 +81,7 @@
       <find>get_co</find>
       <find>the_rest</find>
       <find>run_model</find>
+      <find>vals</find>
     </findStrings>
     <replaceStrings>
       <replace>fl1</replace>
@@ -257,12 +260,12 @@
     <entry file="file://$PROJECT_DIR$/data_processing/test.py" />
     <entry file="file://$USER_HOME$/Desktop/get_new_dropped_cod_data.py" />
     <entry file="file://$PROJECT_DIR$/data_processing/save_me.py" />
-    <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
+    <entry file="file://$PROJECT_DIR$/data_processing/data_viz_helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+        <state relative-caret-position="391">
+          <caret line="23" column="7" selection-start-line="23" selection-start-column="7" selection-end-line="23" selection-end-column="7" />
           <folding>
-            <element signature="e#0#9#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -277,20 +280,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_processing/data_viz_helpers.py">
+    <entry file="file://$PROJECT_DIR$/data_processing/data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="7" selection-start-line="23" selection-start-column="7" selection-end-line="23" selection-end-column="7" />
+        <state relative-caret-position="187">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#9#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="21" lean-forward="true" selection-start-line="19" selection-start-column="21" selection-end-line="19" selection-end-column="21" />
+        <state relative-caret-position="422">
+          <caret line="77" column="14" lean-forward="true" selection-start-line="77" selection-start-column="14" selection-end-line="77" selection-end-column="14" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

@@ -7,8 +7,10 @@ from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
+# import helper functions
 from data_viz_helpers import (clean_strings, hrp2_complex_grouping,
                               hrp2_ratio_grouping)
+# import constants
 from data_viz_helpers import (COLOR_DICT, SHAPE_DICT, ANALYTE_INFO)
 
 
@@ -25,19 +27,10 @@ def analyte_shapes(main_data, analyte, analyte_name):
         plot_data[analyte] = plot_data[analyte].apply(clean_strings)
         plot_data[analyte] = plot_data[analyte].apply(float)
         plot_data = plot_data.loc[~plot_data[analyte].isnull()]
-        vals = plot_data[analyte].tolist()
-        # try to captures "interesting" graphs with a red color
-        try:
-            if (vals[0] < vals[1]) | (vals[0] < vals[2]):
-                plt_color = 'red'
-            else:
-                plt_color = 'blue'
-        except IndexError:
-            plt_color = 'blue'
         f = plt.figure()
         f.add_subplot()
         # line plot with "interest" color
-        plt.plot(plot_data['time_point_days'], plot_data[analyte], color=plt_color, alpha=0.3)
+        plt.plot(plot_data['time_point_days'], plot_data[analyte], color='blue', alpha=0.3)
         dil_vals = plot_data['{}_dilution'.format(analyte)].tolist()
         dil_vals = [val for val in dil_vals if not np.isnan(val)]
         dil_vals = [int(val) if not np.isnan(val) else val for val in dil_vals]
