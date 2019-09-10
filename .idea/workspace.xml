@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,8 +42,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="57" selection-start-line="10" selection-start-column="57" selection-end-line="10" selection-end-column="57" />
+            <state relative-caret-position="306">
+              <caret line="18" column="64" selection-start-line="18" selection-start-column="64" selection-end-line="18" selection-end-column="64" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -102,8 +108,8 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="-7" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="953" />
     <option name="width" value="974" />
     <option name="height" value="1047" />
   </component>
@@ -113,6 +119,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -129,13 +136,12 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../G6PD" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../malaria_classification" />
     <property name="settings.editor.selected.configurable" value="RSettings" />
   </component>
   <component name="RecentsManager">
@@ -169,10 +175,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2702407" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.065565035" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -183,7 +188,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.17833698" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.1744312" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.2844345" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.18418202" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -228,13 +233,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing.py" />
     <entry file="file://$PROJECT_DIR$/data_processing/4plex_processing_other_dilutions.ipynb" />
-    <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay.ipynb">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="684" column="32" selection-start-line="684" selection-start-column="32" selection-end-line="684" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay.ipynb" />
     <entry file="file://$PROJECT_DIR$/rate_of_decay/log_decay_script.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="850">
@@ -285,8 +284,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="57" selection-start-line="10" selection-start-column="57" selection-end-line="10" selection-end-column="57" />
+        <state relative-caret-position="306">
+          <caret line="18" column="64" selection-start-line="18" selection-start-column="64" selection-end-line="18" selection-end-column="64" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
