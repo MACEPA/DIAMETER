@@ -138,6 +138,7 @@ def hrp2_ratio_grouping(main_data):
     bad_df['ratio'] = bad_df['LDH_Pan_pg_ml'].divide(bad_df['HRP2_pg_ml'])
     combo_df = pd.concat([good_df, bad_df])
     combo_df['returned_with_fever'].fillna('No', inplace=True)
+    combo_df['returned_with_fever'] = combo_df['returned_with_fever'].apply(lambda x: 'Yes' if x == 1.0 else x)
     combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'No' if x == 0.0 else x)
     combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'Yes' if x == 1.0 else x)
     return combo_df

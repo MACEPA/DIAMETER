@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
+from  more_itertools import unique_everseen
 from matplotlib.backends.backend_pdf import PdfPages
 # import helper functions
 from data_viz_helpers import (clean_strings, rebuild_data,
@@ -197,6 +198,75 @@ def plot_hrp2_groups(main_data, version):
         # combine all the lines to create a composite legend
         lns = ln1 + ln2 + ln3 + ln4
         labs = [l.get_label() for l in lns]
+        # place the legend below the plot
+        ax2.legend(lns, labs, bbox_to_anchor=(.75, -.2), ncol=2)
+        f.tight_layout()
+        # save the plot
+        pp.savefig(f)
+        plt.close()
+    pp.close()
+
+
+def plot_meta(main_data):
+    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
+    pp = PdfPages('{}/meta_namibia.pdf'.format(output_fp))
+    for pid in main_data['patient_id'].unique():
+        # subset data to individual patient_id
+        combo = main_data.loc[main_data['patient_id'] == pid]
+        # sort the days to get rid of weird graphing artifacts
+        combo = combo.sort_values('time_point_days')
+        # fetch max and min y values for creating returned lines
+        max_y = max([max(combo['HRP2_pg_ml']), max(combo['LDH_Pan_pg_ml'])])
+        min_y = min([min(combo['HRP2_pg_ml']), min(combo['LDH_Pan_pg_ml'])])
+        # fetch different metadata values
+        sex = combo['sex'].unique()[0]
+        age = combo['age'].unique()[0]
+        returned = combo['returned_with_fever'].unique()[0]
+        retreated = combo['retreated'].unique()[0]
+        when_returned = combo['when_returned_with_fever'].unique()[0]
+        # clean the date returned value
+        if isinstance(when_returned, str):
+            try:
+                cleaned = [int(when_returned)]
+            except ValueError:
+                cleaned = when_returned.replace('and ', '')
+                cleaned = cleaned.replace(' ', '')
+                cleaned = [int(x) for x in cleaned.split(',')]
+        else:
+            cleaned = []
+        # set the date retreated value to int if possible
+        when_retreated = combo['when_retreated'].unique()[0]
+        if ~np.isnan(when_retreated):
+            when_retreated = int(when_retreated)
+        # create the first plot axis
+        f, ax1 = plt.subplots()
+        title = "pid: {}, sex: {}, age: {},\nreturned w/ fever: {}, date: {}\nretreated: {}, date: {}".format(
+            pid, sex, age, returned, when_returned, retreated, when_retreated)
+        ax1.set_title(title)
+        # plot the HRP2 against days, the LDH against days
+        ln1 = ax1.plot(combo['time_point_days'], combo['HRP2_pg_ml'], c='black', alpha=0.6, label='HRP2')
+        ln2 = ax1.plot(combo['time_point_days'], combo['LDH_Pan_pg_ml'], c='green', alpha=0.6, label='pLDH')
+        ax1.scatter(combo['time_point_days'], combo['HRP2_pg_ml'], c='blue')
+        ax1.set_xlabel('Time point, in days')
+        ax1.set_ylabel('Log of pg/ml')
+        # clone the y axis for plotting the ratio on a different scale
+        ax2 = ax1.twinx()
+        # set the new y axis label and color
+        ax2.set_ylabel('Ratio of pLDH/HRP2', c='brown')
+        # plot the ratio on the new axis
+        ln3 = ax2.plot(combo['time_point_days'], combo['ratio'], c='brown', alpha=0.6)
+        ax2.tick_params(axis='y', labelcolor='brown')
+        # combine first three lines to create a composite legend
+        lns = ln1 + ln2 + ln3
+        # create lines for returned dates if necessary
+        for when_returned in cleaned:
+            print(when_returned)
+            return_line = ax1.plot(np.array([when_returned, when_returned]), np.array([min_y, max_y]),
+                                   color='purple', label='Returned')
+            lns = lns + return_line
+        labs = [l.get_label() for l in lns]
+        # function for getting unique list values while preserving order
+        labs = list(unique_everseen(labs))
         # place the legend below the plot
         ax2.legend(lns, labs, bbox_to_anchor=(.75, -.2), ncol=2)
         f.tight_layout()
