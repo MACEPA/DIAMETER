@@ -8,8 +8,8 @@ from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
 from matplotlib.backends.backend_pdf import PdfPages
 # import helper functions
-from data_viz_helpers import (clean_strings, hrp2_complex_grouping,
-                              hrp2_ratio_grouping)
+from data_viz_helpers import (clean_strings, rebuild_data,
+                              hrp2_complex_grouping, hrp2_ratio_grouping)
 # import constants
 from data_viz_helpers import (COLOR_DICT, SHAPE_DICT, ANALYTE_INFO)
 
@@ -204,25 +204,6 @@ def plot_hrp2_groups(main_data, version):
         pp.savefig(f)
         plt.close()
     pp.close()
-
-
-def rebuild_data(main_data, val_cols):
-    # create a dataframe with no short timeseries (<4 points) and
-    # no timeseries where HRP2 < 10 initially
-    rebuilt_data = []
-    for pid in main_data['patient_id'].unique():
-        sub_data = main_data.loc[main_data['patient_id'] == pid]
-        if len(sub_data) < 4:
-            continue
-        all_times = sub_data['time_point_days'].unique().tolist()
-        start_val = sub_data.loc[sub_data['time_point_days'] == min(all_times), 'HRP2_pg_ml'].item()
-        if start_val < 10:
-            continue
-        rebuilt_data.append(sub_data)
-    rebuilt_data = pd.concat(rebuilt_data)
-    # return the log10 of all data columns, instead of normal space
-    rebuilt_data[val_cols] = rebuilt_data[val_cols].applymap(np.log10)
-    return rebuilt_data
 
 
 def plot_zero_density(main_data):

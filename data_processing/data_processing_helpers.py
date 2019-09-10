@@ -73,6 +73,13 @@ def remove_time(df):
     return '{}-{}'.format(patient[0], patient[1])
 
 
+# function for removing 'day' from strings
+def remove_day(x):
+    if isinstance(x, str):
+        x = x.replace('day ', '')
+    return x
+
+
 # threshhold values for various analytes
 THRESHOLDS = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
               'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}

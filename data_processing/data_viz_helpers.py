@@ -27,6 +27,25 @@ def get_coef(df, col1, col2):
     return coef, score
 
 
+def rebuild_data(main_data, val_cols):
+    # create a dataframe with no short timeseries (<4 points) and
+    # no timeseries where HRP2 < 10 initially
+    rebuilt_data = []
+    for pid in main_data['patient_id'].unique():
+        sub_data = main_data.loc[main_data['patient_id'] == pid]
+        if len(sub_data) < 4:
+            continue
+        all_times = sub_data['time_point_days'].unique().tolist()
+        start_val = sub_data.loc[sub_data['time_point_days'] == min(all_times), 'HRP2_pg_ml'].item()
+        if start_val < 10:
+            continue
+        rebuilt_data.append(sub_data)
+    rebuilt_data = pd.concat(rebuilt_data)
+    # return the log10 of all data columns, instead of normal space
+    rebuilt_data[val_cols] = rebuilt_data[val_cols].applymap(np.log10)
+    return rebuilt_data
+
+
 def hrp2_complex_grouping(main_data):
     # run HRP2 grouping
     good_df = []
@@ -118,6 +137,9 @@ def hrp2_ratio_grouping(main_data):
     bad_df['group'] = 'red'
     bad_df['ratio'] = bad_df['LDH_Pan_pg_ml'].divide(bad_df['HRP2_pg_ml'])
     combo_df = pd.concat([good_df, bad_df])
+    combo_df['returned_with_fever'].fillna('No', inplace=True)
+    combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'No' if x == 0.0 else x)
+    combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'Yes' if x == 1.0 else x)
     return combo_df
 
 

@@ -6,7 +6,7 @@ from functools import partial, reduce
 # import helper functions
 from data_processing_helpers import (run_compare, return_decisions,
                                      fix_concentrations, split_time,
-                                     remove_time)
+                                     remove_time, remove_day)
 # import constants
 from data_processing_helpers import THRESHOLDS
 
@@ -190,6 +190,17 @@ def main(input_dir):
     no_duplicates = pd.concat([no_duplicates, deduped])
     # run decision function
     output_df = decider(no_duplicates)
+    # read in metadata
+    add_info = pd.read_stata('C:/Users/lzoeckler/Desktop/4plex/input_data/additional_info.dta')
+    # clean and subset the metadata to prep for appending
+    add_info = add_info.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+    add_info.rename(columns={'sample_id': 'patient_id'}, inplace=True)
+    add_info.drop(['pa_id', 'priority_level', 'boxnumber', 'position', 'comments'], axis=1, inplace=True)
+    add_info['time_point_days'] = add_info.apply(split_time, axis=1)
+    add_info['patient_id'] = add_info.apply(remove_time, axis=1)
+    add_info.drop_duplicates(subset=['patient_id', 'time_point_days'], inplace=True, keep='last')
+    add_info['when_returned_with_fever'] = add_info['when_returned_with_fever'].apply(remove_day)
+    add_info['when_retreated'] = add_info['when_retreated'].apply(remove_day)
     # split time associated with patient_id into its own column
     output_df['time_point_days'] = output_df.apply(split_time, axis=1)
     output_df['patient_id'] = output_df.apply(remove_time, axis=1)
