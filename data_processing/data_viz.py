@@ -221,8 +221,6 @@ def plot_meta(main_data):
         # fetch different metadata values
         sex = combo['sex'].unique()[0]
         age = combo['age'].unique()[0]
-        returned = combo['returned_with_fever'].unique()[0]
-        retreated = combo['retreated'].unique()[0]
         when_returned = combo['when_returned_with_fever'].unique()[0]
         # clean the date returned value
         if isinstance(when_returned, str):
@@ -238,15 +236,20 @@ def plot_meta(main_data):
         when_retreated = combo['when_retreated'].unique()[0]
         if ~np.isnan(when_retreated):
             when_retreated = int(when_retreated)
+            # set color of retreated time point to yellow
+            combo.loc[combo['time_point_days'] == when_retreated, 'group'] = 'yellow'
         # create the first plot axis
         f, ax1 = plt.subplots()
-        title = "pid: {}, sex: {}, age: {},\nreturned w/ fever: {}, date: {}\nretreated: {}, date: {}".format(
-            pid, sex, age, returned, when_returned, retreated, when_retreated)
+        title = "pid: {}, sex: {}, age: {}".format(pid, sex, age)
         ax1.set_title(title)
         # plot the HRP2 against days, the LDH against days
         ln1 = ax1.plot(combo['time_point_days'], combo['HRP2_pg_ml'], c='black', alpha=0.6, label='HRP2')
         ln2 = ax1.plot(combo['time_point_days'], combo['LDH_Pan_pg_ml'], c='green', alpha=0.6, label='pLDH')
         ax1.scatter(combo['time_point_days'], combo['HRP2_pg_ml'], c='blue')
+        # create lines for returned dates if necessary
+        for when_returned in cleaned:
+            ax1.plot(np.array([when_returned, when_returned]), np.array([min_y, max_y]),
+                     color='purple', linestyle='--', alpha=0.6)
         ax1.set_xlabel('Time point, in days')
         ax1.set_ylabel('Log of pg/ml')
         # clone the y axis for plotting the ratio on a different scale
@@ -258,12 +261,12 @@ def plot_meta(main_data):
         ax2.tick_params(axis='y', labelcolor='brown')
         # combine first three lines to create a composite legend
         lns = ln1 + ln2 + ln3
-        # create lines for returned dates if necessary
-        for when_returned in cleaned:
-            print(when_returned)
-            return_line = ax1.plot(np.array([when_returned, when_returned]), np.array([min_y, max_y]),
-                                   color='purple', label='Returned')
-            lns = lns + return_line
+        # also add in the flagged points, returned line, and retreated point
+        lns = lns + [Line2D([0], [0], marker='o', color='k', label='Flagged', markerfacecolor='r',
+                            markersize=10, alpha=0.6)]
+        lns = lns + [Line2D([0], [0], color='purple', linestyle='--', label='Returned', alpha=0.6)]
+        lns = lns + [Line2D([0], [0], marker='o', color='k', label='Retreated', markerfacecolor='y',
+                            markersize=10, alpha=0.6)]
         labs = [l.get_label() for l in lns]
         # function for getting unique list values while preserving order
         labs = list(unique_everseen(labs))

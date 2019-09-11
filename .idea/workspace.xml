@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/data_viz.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_viz.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/data_viz_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/data_viz_helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/meta_group_graphs-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/meta_group_graphs-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,8 +43,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="277" selection-start-line="277" selection-end-line="277" />
+            <state relative-caret-position="272">
+              <caret line="250" column="88" lean-forward="true" selection-start-line="250" selection-start-column="88" selection-end-line="250" selection-end-column="88" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -107,11 +109,10 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="122" />
-    <option name="y" value="-1050" />
-    <option name="width" value="854" />
-    <option name="height" value="1017" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="y" value="61" />
+    <option name="width" value="1680" />
+    <option name="height" value="979" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -175,10 +176,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="122" y="-1050" width="854" height="1017" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15491185" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.065565035" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -189,7 +190,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.1821267" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" sideWeight="0.49938875" visible="true" weight="0.1744312" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50061125" side_tool="true" weight="0.2844345" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.18418202" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -285,8 +286,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_processing/data_viz.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="277" selection-start-line="277" selection-end-line="277" />
+        <state relative-caret-position="272">
+          <caret line="250" column="88" lean-forward="true" selection-start-line="250" selection-start-column="88" selection-end-line="250" selection-end-column="88" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
