@@ -1,11 +1,8 @@
-import math
 import numpy as np
 import pandas as pd
-from functools import reduce
 from scipy.special import expit
 import matplotlib.pyplot as plt
 from sklearn import linear_model
-from sklearn.metrics import r2_score
 from sklearn.metrics import roc_curve, auc
 from matplotlib.backends.backend_pdf import PdfPages
 # set chained assignment to ignore warnings
