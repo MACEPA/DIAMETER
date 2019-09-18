@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 from matplotlib.lines import Line2D
 from sklearn.metrics import r2_score
-from  more_itertools import unique_everseen
+from more_itertools import unique_everseen
 from matplotlib.backends.backend_pdf import PdfPages
 # import helper functions
 from data_viz_helpers import (clean_strings, rebuild_data,
