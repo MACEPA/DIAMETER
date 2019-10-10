@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/slide_graph.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/slide_graph.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/processing/.ipynb_checkpoints/quansys_data_cleaning-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/.ipynb_checkpoints/quansys_data_cleaning-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs_old.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs_old.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
