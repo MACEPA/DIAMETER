@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/meta_group_graphs.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs_old.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/sub_group_graphs_old.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/4plex_data_processing.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/quansys_data_cleaning.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/working_complex_grouping-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/working_complex_grouping-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,24 +18,6 @@
         <option value="Python Script" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>partial</find>
-      <find>np</find>
-      <find>FL1</find>
-      <find>FSC</find>
-      <find>get_co</find>
-      <find>the_rest</find>
-      <find>run_model</find>
-      <find>vals</find>
-      <find>end_df</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>fl1</replace>
-      <replace>ssc</replace>
-      <replace>fsc</replace>
-    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
