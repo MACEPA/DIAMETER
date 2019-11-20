@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/working_complex_grouping-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/working_complex_grouping-checkpoint.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,7 +26,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../malaria_classification" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="RSettings" />
   </component>
   <component name="RecentsManager">
@@ -65,7 +64,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
