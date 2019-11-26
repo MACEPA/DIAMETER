@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/working_complex_grouping.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/mali_data_class_attempt_tday_split-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/.ipynb_checkpoints/mali_data_class_attempt_tday_split-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/mali_data_class_attempt_tday_split.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/mali_data_class_attempt_tday_split.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/graphing/mali_data_grouping.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/graphing/mali_data_grouping.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/G6PD_data_combining.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/G6PD_data_combining.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
