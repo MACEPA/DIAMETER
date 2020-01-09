@@ -16,15 +16,13 @@ def clean_strings(val):
 
 # function for running a linear regression on two columns
 # returns the coefficient of the regression and the R2 score
-def get_coef(df, col1, col2):
+def get_coef(df, col1='time_point_days', col2='HRP2_pg_ml'):
     regr = linear_model.LinearRegression()
     time = df[col1].values.reshape(-1, 1)
     val = df[col2].values.reshape(-1, 1)
     regr.fit(time, val)
     coef = np.float(regr.coef_)
-    pred = regr.predict(time)
-    score = r2_score(val, pred)
-    return coef, score
+    return coef
 
 
 def rebuild_data(main_data, val_cols):
@@ -46,103 +44,144 @@ def rebuild_data(main_data, val_cols):
     return rebuilt_data
 
 
-def hrp2_complex_grouping(main_data):
-    # run HRP2 grouping
-    good_df = []
-    bad_df = []
+def hrp2_outliering(main_data):
+    all_dfs = []
+    # loop through patients
     for pid in main_data['patient_id'].unique():
-        # subset data to individual patient_id, only HRP2 data
+        # subset data to just PID of interest
         pid_data = main_data.loc[main_data['patient_id'] == pid]
+        # fetch and sort day values
         all_times = pid_data['time_point_days'].unique().tolist()
         all_times.sort()
-        max_run = 3
+        # get first three days
+        first_days = all_times[:3]
+        # get other times
+        later_days = all_times[3:]
+        # get initial HRP2 value
+        initial_pg = pid_data.loc[pid_data['time_point_days'] == first_days[0], 'HRP2_pg_ml'].item()
+        # subset a dataframe of just the first three days
+        early_df = pid_data.loc[pid_data['time_point_days'].isin(first_days)]
+        # get the mean of the first three HRP2 values
+        mean_val = early_df['HRP2_pg_ml'].mean()
+        # subset a dataframe to all the other days
+        other_df = pid_data.loc[~pid_data['time_point_days'].isin(first_days)]
+        # start the outliering here
+        i = 3
+        outlier_vals = []
+        while i <= len(later_days) + 1:
+            try:
+                time_vals = all_times[i - 1:i + 2]
+                num_days = 3
+            except IndexError:
+                time_vals = all_times[i - 1:i]
+                num_days = 2
+            prev_val = pid_data.loc[pid_data['time_point_days'] == time_vals[0], 'HRP2_pg_ml'].item()
+            day_val = pid_data.loc[pid_data['time_point_days'] == time_vals[1], 'HRP2_pg_ml'].item()
+            if num_days == 3:
+                next_val = pid_data.loc[pid_data['time_point_days'] == time_vals[2], 'HRP2_pg_ml'].item()
+                cond_a = ((day_val - prev_val) > 1.5) & ((day_val - next_val) > 1.5)
+                cond_b = ((prev_val - day_val) > 1.5) & ((next_val - day_val) > 1.5)
+                if cond_a or cond_b:
+                    outlier_vals.append(time_vals[1])
+            else:
+                if abs(day_val - prev_val) > 2:
+                    outlier_vals.append(time_vals[1])
+            i += 1
+        outliered_df = pid_data.loc[~pid_data['time_point_days'].isin(outlier_vals)]
+        all_dfs.append(outliered_df)
+    return pd.concat(all_dfs)
+
+
+def hrp2_grouping(main_data):
+    all_dfs = []
+    # loop through patients
+    for pid in main_data['patient_id'].unique():
+        # subset data to just PID of interest
+        pid_data = main_data.loc[main_data['patient_id'] == pid]
+        # fetch and sort day values
+        all_times = pid_data['time_point_days'].unique().tolist()
+        all_times.sort()
+        # get first three days
+        first_days = all_times[:3]
+        # get other times
+        later_days = all_times[3:]
+        # get initial HRP2 value
+        initial_pg = pid_data.loc[pid_data['time_point_days'] == first_days[0], 'HRP2_pg_ml'].item()
+        # subset a dataframe of just the first three days
+        early_df = pid_data.loc[pid_data['time_point_days'].isin(first_days)]
+        # second and third points must be clearing (green)
+        early_df['group'] = 'green'
+        # first point must be one of either symptomatic (red) or chronic (yellow)
+        first_fever = pid_data['fever48_r'].unique()[0]
+        if first_fever == 1:
+            early_df.loc[early_df['time_point_days'] == first_days[0], 'group'] = 'red'
+        else:
+            early_df.loc[early_df['time_point_days'] == first_days[0], 'group'] = 'yellow'
+        # get the mean of the first three HRP2 values
+        mean_val = early_df['HRP2_pg_ml'].mean()
+        # subset a dataframe to all the other days
+        other_df = pid_data.loc[~pid_data['time_point_days'].isin(first_days)]
+        # set to clearing as a base line
+        other_df['group'] = 'green'
+        # get the date of retreatment if it exists
+        when_retreated = other_df['when_retreated'].unique()[0]
+        # start the complex grouping here!
+        the_rest = []
         i = 0
         end_val = 4
-        baddest_section = []
-        the_rest_set = set([0])
-        while (end_val <= len(all_times)) & (len(the_rest_set) != 0):
-            next_start = None
-            time_vals = all_times[i:end_val]
-            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
-            avg_val = coef_data['HRP2_pg_ml'].mean()
-            coef, score = get_coef(coef_data, 'time_point_days', 'HRP2_pg_ml')
-            extended_time = all_times[end_val:end_val + 4]
-        if len(extended_time) > 2:
-            extended_data = pid_data.loc[pid_data['time_point_days'].isin(extended_time)]
-            extended_coef, extended_score = get_coef(extended_data, 'time_point_days', 'HRP2_pg_ml')
-        else:
-            extended_score = 0
-        while (coef > -.03) & (len(time_vals) != 1) & (avg_val > 2.5) & (end_val < len(all_times)):
-            end_val = end_val + 1
-            time_vals = all_times[i:end_val]
-            coef_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
-            coef, score = get_coef(coef_data, 'time_point_days', 'HRP2_pg_ml')
-            avg_val = coef_data['HRP2_pg_ml'].mean()
-            end_data = pid_data.loc[pid_data['time_point_days'].isin(time_vals[-4:])]
-            end_coef, end_score = get_coef(end_data, 'time_point_days', 'HRP2_pg_ml')
-            extended_time = all_times[end_val:end_val + 4]
-            condition1 = (coef > -.03) & (avg_val > 2.5) & (score < .3) & (end_score < .4)
-            condition2 = (coef > 0) & (avg_val > 2.5) & (score < .3)
-            if condition1 or condition2:
-                current_run = len(time_vals)
-                next_start = end_val - 1
-                if current_run > max_run:
-                    max_run = current_run
-                    baddest_section = time_vals
-        if next_start:
-            i = next_start
-        else:
-            i = end_val - 3
-        try:
-            all_times[i + 4]
-            end_val = i + 4
-        except IndexError:
-            the_rest = all_times[i:]
-            the_rest_set = set(the_rest) - set(time_vals)
-            end_val = i + len(the_rest)
-        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(baddest_section)]
-        good_df.append(good_vals)
-        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(baddest_section)]
-        bad_df.append(bad_vals)
-    good_df = pd.concat(good_df)
-    bad_df = pd.concat(bad_df)
-    good_df['group'] = 'blue'
-    bad_df['group'] = 'red'
-    combo_df = pd.concat([good_df, bad_df])
-    return combo_df
-
-
-def hrp2_ratio_grouping(main_data):
-    good_df = []
-    bad_df = []
-    for pid in main_data['patient_id'].unique():
-        bad_days = []
-        pid_data = main_data.loc[main_data['patient_id'] == pid]
-        pid_data.sort_values('time_point_days', inplace=True)
-        all_times = pid_data['time_point_days'].unique().tolist()
-        all_times.sort()
-        for day in all_times:
-            day_df = pid_data.loc[pid_data['time_point_days'] == day]
-            day_df['ratio'] = day_df['LDH_Pan_pg_ml'].divide(day_df['HRP2_pg_ml'])
-            if (day_df['ratio'].item() > .8) & (day_df['HRP2_pg_ml'].item() > 4):
-                bad_days.append(day)
-        good_vals = pid_data.loc[~pid_data['time_point_days'].isin(bad_days)]
-        good_df.append(good_vals)
-        bad_vals = pid_data.loc[pid_data['time_point_days'].isin(bad_days)]
-        bad_df.append(bad_vals)
-    good_df = pd.concat(good_df)
-    bad_df = pd.concat(bad_df)
-    good_df['group'] = 'blue'
-    good_df['ratio'] = good_df['LDH_Pan_pg_ml'].divide(good_df['HRP2_pg_ml'])
-    bad_df['group'] = 'red'
-    bad_df['ratio'] = bad_df['LDH_Pan_pg_ml'].divide(bad_df['HRP2_pg_ml'])
-    combo_df = pd.concat([good_df, bad_df])
-    combo_df['returned_with_fever'].fillna('No', inplace=True)
-    combo_df['returned_with_fever'] = combo_df['returned_with_fever'].apply(lambda x: 'Yes' if x == 1.0 else x)
-    combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'No' if x == 0.0 else x)
-    combo_df['retreated'] = combo_df['retreated'].apply(lambda x: 'Yes' if x == 1.0 else x)
-    return combo_df
-
+        max_run = 4
+        chronic_vals = []
+        longest_section = []
+        set_all = False
+        if first_fever != 1:
+            final_pg = pid_data.loc[pid_data['time_point_days'] == later_days[-1], 'HRP2_pg_ml'].item()
+            if (final_pg > 2.9) or ((initial_pg - final_pg) < 1):
+                set_all = True
+        while (end_val < len(all_times)) & (len(the_rest) != 1):
+            time_vals = later_days[i:end_val]
+            small_df = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
+            coef_a = get_coef(small_df)
+            while (coef_a > -.02) & (len(time_vals) != 1) & (end_val < len(all_times)):
+                end_val = end_val + 1
+                time_vals = later_days[i:end_val]
+                bigger_df = pid_data.loc[pid_data['time_point_days'].isin(time_vals)]
+                coef_b = get_coef(bigger_df)
+                if coef_b > -.01:
+                    final_4 = time_vals[-4:]
+                    check_df = pid_data.loc[pid_data['time_point_days'].isin(final_4)]
+                    coef_c = get_coef(check_df)
+                    if coef_c > -.05:
+                        current_run = len(time_vals)
+                        if current_run > max_run:
+                            max_run = current_run
+                            longest_section = time_vals[:-1]
+                            chronic_vals += longest_section
+            i = end_val - 1
+            try:
+                all_times[i + 4]
+                end_val = i + 4
+            except IndexError:
+                the_rest = all_times[i:]
+                end_val = i + len(the_rest)
+        chronic_vals = list(set(chronic_vals))
+        chronic_df = other_df.loc[other_df['time_point_days'].isin(chronic_vals)]
+        other_df = other_df.loc[~other_df['time_point_days'].isin(chronic_vals)]
+        chronic_df['group'] = 'yellow'
+        chronic_df.loc[chronic_df['HRP2_pg_ml'] < 1.5, 'group'] = 'green'
+        other_df = pd.concat([other_df, chronic_df])
+        combined = pd.concat([early_df, other_df])
+        if set_all:
+            combined['group'] = 'yellow'
+        if when_retreated is not None:
+            if pid != 'pa-026':  # patient 26 doesn't make sense and was treated after the study ended
+                combined.loc[combined['time_point_days'] == when_retreated, 'group'] = 'red'
+                before_retreat = combined.loc[combined['time_point_days'] < when_retreated]
+                before_retreat.loc[before_retreat['group'] == 'green', 'group'] = 'yellow'
+                before_days = before_retreat['time_point_days'].unique().tolist()
+                combined = combined.loc[~combined['time_point_days'].isin(before_days)]
+                combined = pd.concat([before_retreat, combined])
+        all_dfs.append(combined)
+    return pd.concat(all_dfs)
 
 # get all colors and shapes for association
 all_colors = cm.rainbow(np.linspace(0, 1, 8))

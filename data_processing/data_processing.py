@@ -146,7 +146,7 @@ def decider(base_df):
 
 def main(input_dir):
     dfs = []
-    input_path = '/input_data/20190610'.format(input_dir)
+    input_path = '{}/input_data/20190610'.format(input_dir)
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
         plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
@@ -191,7 +191,7 @@ def main(input_dir):
     # run decision function
     output_df = decider(no_duplicates)
     # read in metadata
-    add_info = pd.read_stata('C:/Users/lzoeckler/Desktop/4plex/input_data/additional_info.dta')
+    add_info = pd.read_stata('{}/input_data/additional_info.dta'.format(input_dir))
     # clean and subset the metadata to prep for appending
     add_info = add_info.applymap(lambda x: x.lower() if isinstance(x, str) else x)
     add_info.rename(columns={'sample_id': 'patient_id'}, inplace=True)

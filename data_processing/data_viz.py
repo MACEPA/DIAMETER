@@ -10,7 +10,7 @@ from more_itertools import unique_everseen
 from matplotlib.backends.backend_pdf import PdfPages
 # import helper functions
 from data_viz_helpers import (clean_strings, rebuild_data,
-                              hrp2_complex_grouping, hrp2_ratio_grouping)
+                              hrp2_outliering, hrp2_grouping)
 # import constants
 from data_viz_helpers import (COLOR_DICT, SHAPE_DICT, ANALYTE_INFO)
 
@@ -384,10 +384,9 @@ def plot_all_points_analytes(main_data, version):
     ratios.close()
 
 
-def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2):
+def main(input_dir, run_shapes, run_points, run_connected, run_group):
     # read in formatted dilution CSV
-    input_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_fp))
+    main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_dir))
     # loop through analytes to create different PDFs for each
     for analyte in ANALYTE_INFO.keys():
         analyte_name = ANALYTE_INFO[analyte]
@@ -401,40 +400,33 @@ def main(run_shapes, run_points, run_connected, run_complex_hrp2, run_ratio_hrp2
         if run_connected:
             analyte_connected_individuals(main_data, analyte, analyte_name)
         # produce HRP2 groups
-    if run_complex_hrp2 or run_ratio_hrp2:
+    if run_group:
         val_cols = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'CRP_ng_ml']
         # generate a dataframe that's easier to work with for HRP2 grouping
         rebuilt_data = rebuild_data(main_data, val_cols)
         # run a grouping based on iterative linear regressions in log space
-        if run_complex_hrp2:
-            # get grouped data
-            grouped_data = hrp2_complex_grouping(rebuilt_data)
-            # generate all the different plots
-            plot_hrp2_groups(grouped_data, 'complex')
-            plot_all_points_analytes(grouped_data, 'complex')
-        # run a grouping based on the ratio of HRP2 and pLDH
-        if run_ratio_hrp2:
-            # get grouped data
-            grouped_data = hrp2_ratio_grouping(rebuilt_data)
-            # generate all the different plots
-            plot_hrp2_groups(grouped_data, 'ratio_based')
-            plot_zero_density(grouped_data)
-            plot_nonzero_density(grouped_data)
-            plot_all_points_analytes(grouped_data, 'ratio_based')
+        # get outliered data
+        outliered_data = hrp2_outliering(rebuilt_data)
+        # get grouped data
+        grouped_data = hrp2_grouping(outliered_data)
+        # generate all the different plots
+        plot_hrp2_groups(grouped_data)
+        plot_all_points_analytes(grouped_data)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('-id', '--input_dir', type=str,
+                        default='C:/Users/lzoeckler/Desktop/4plex/output_data',
+                        help='Input directory for all PCR data')
     parser.add_argument('-rs', '--run_shapes', action='store_true',
                         help='Whether or not to produce shape graphs')
     parser.add_argument('-rp', '--run_points', action='store_true',
                         help='Whether or not to produce point graphs')
     parser.add_argument('-rc', '--run_connected', action='store_true',
                         help='Whether or not to produce connected graphs')
-    parser.add_argument('-rch', '--run_complex_hrp2', action='store_true',
-                        help='Whether or not to produce HRP2 complex grouping graphs')
-    parser.add_argument('-rrh', '--run_ratio_hrp2', action='store_true',
-                        help='Whether or not to produce HRP2 ratio grouping graphs')
+    parser.add_argument('-rg', '--run_group', action='store_true',
+                        help='Whether or not to produce HRP2 grouping graphs')
     args = parser.parse_args()
-    main(run_shapes=args.run_shapes, run_points=args.run_points, run_connected=args.run_connected,
-         run_complex_hrp2=args.run_complex_hrp2, run_ratio_hrp2=args.run_ratio_hrp2)
+    main(input_dir=args.input_dir, run_shapes=args.run_shapes, run_points=args.run_points,
+         run_connected=args.run_connected, run_group=args.run_group)
