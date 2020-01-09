@@ -9,41 +9,48 @@ from data_viz_helpers import clean_strings
 pd.set_option('chained_assignment', None)
 
 
-def main():
-    main_data = pd.read_csv('C:/Users/lzoeckler/Desktop/mali_meta/for_viz.csv')
+def main(input_dir):
+    # Read in slightly formatted Mali data
+    main_data = pd.read_csv('{}/for_viz.csv'.format(input_dir))
+    # Set and clean value columns, then put them in log10 space
     val_cols = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'LDH_Pv_pg_ml', 'CRP_ng_ml']
     main_data[val_cols] = main_data[val_cols].applymap(clean_strings)
     main_data[val_cols] = main_data[val_cols].applymap(np.log10)
+    # Keep only columns of interest
     main_data = main_data[['sample_id', 'id_number', 'HRP2_pg_ml', 'LDH_Pan_pg_ml',
                            'LDH_Pv_pg_ml', 'CRP_ng_ml', 'timepoint_days', 'date_dif',
                            'drug', 'age_yrs', 'RDT_pos', 'HRP2_result',
                            'LDH_Pan_result', 'LDH_Pv_result']]
     main_data.rename(columns={'id_number': 'participant_id'}, inplace=True)
+    # Make a subset of only RDT positive results
     pos_vals = main_data.loc[main_data['RDT_pos'] == 1]
+    # Set a little red flag for weeeird RDT positives
     pos_vals.loc[pos_vals['HRP2_pg_ml'] < 1.4, 'RDT_pos'] = -999
+    # Make a subset of only RDT negative results
     neg_vals = main_data.loc[main_data['RDT_pos'] != 1]
+    # Recombine the two subsets, overwriting main_data
     main_data = pd.concat([pos_vals, neg_vals])
+    # Color code the different RDT results
     rdt_vars = {'RDT_pos': {0: 'green', 1: 'red', 2: 'yellow', np.nan: 'black'}}
     main_data.replace(rdt_vars, inplace=True)
+    # Set timepoint_days to be date_df where it's null
     null_days = main_data.loc[main_data['timepoint_days'].isnull()]
     null_days = null_days.loc[~null_days['drug'].isnull()]
     null_days['timepoint_days'] = null_days['date_dif']
     main_data = main_data.loc[~main_data['timepoint_days'].isnull()]
     main_data = pd.concat([null_days, main_data])
-
-    class_data = main_data.copy(deep=True)
-    garbage_pids = [316, 317, 318, 329, 338, 371, 396, 416, 425, 441, 461, 472, 485, 500]
-    idk = [330]
+    # Toss out unusable patient ids (also keep track of some weird ones...)
+    unusable_pids = [316, 317, 318, 329, 338, 371, 396, 416, 425, 441, 461, 472, 485, 500]
+    otherwise_bad_pids = [330]
     questionable_pids = [311, 335, 352, 398, 473, 491, 496, 497]
-    usable_data = class_data.loc[~class_data['participant_id'].isin(garbage_pids)]
-    usable_data = usable_data.loc[~usable_data['participant_id'].isin(idk)]
+    usable_data = main_data.loc[~main_data['participant_id'].isin(unusable_pids)]
+    usable_data = usable_data.loc[~usable_data['participant_id'].isin(otherwise_bad_pids)]
+    # Set the default initial class color to purple, will be overwritten later
     usable_data['class'] = 'purple'
-
-    # Split into 0, 1, 2, and 3 treatment days
+    # Split into 0, 1, and 2 treatment day pids (all 3 treatment day pids are bad, so no need to split them)
     no_tday = []
     one_tday = []
     two_tday = []
-    three_tday = []
     for pid in usable_data['participant_id'].unique():
         pid_data = usable_data.loc[usable_data['participant_id'] == pid]
         null_dates = pid_data.loc[pid_data['date_dif'].isnull()]
@@ -63,10 +70,14 @@ def main():
     no_tday = pd.concat(no_tday)
     one_tday = pd.concat(one_tday)
     two_tday = pd.concat(two_tday)
-
+    # The way the algorithm is set up, it runs sort of separately on each set of treatment day numbers
+    # First, we run on patient ids with no treatment days
     classed_no_tday = []
+    # Loop over all patient ids with no treatment days
     for pid in no_tday['participant_id'].unique():
+        # Subset to that specific patient id
         pid_data = no_tday.loc[no_tday['participant_id'] == pid]
+        # Sort the dataframe based on date_dif date column
         pid_data.sort_values('date_dif', inplace=True)
         study_data = pid_data.loc[~pid_data['HRP2_pg_ml'].isnull()]
         study_days = study_data['date_dif'].tolist()
@@ -341,4 +352,5 @@ def main():
 
 
 if __name__ == "__main__":
+    'C:/Users/lzoeckler/Desktop/mali_meta'
     main()
