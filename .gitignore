@@ -1,3 +1,4 @@
 *.pdf
 *.csv
 data_processing/dummy_graphs.py
+venv/
