@@ -5,24 +5,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-
-
-def clean_strings(val):
-    if isinstance(val, str):
-        if '<' in val:
-            return np.log10(.1)
-        elif '>' in val:
-            clean = val.replace('> ', '')
-            return np.log10(float(clean) + .1)
-        else:
-            try:
-                return np.log10(float(val) + .1)
-            except ValueError:
-                return np.null
-    elif isinstance(val, float) or isinstance(val, int):
-        return np.log10(val + .1)
-    else:
-        raise
+# import helper functions
+from threshold_helpers import clean_strings
 
 
 def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, run_dual):
