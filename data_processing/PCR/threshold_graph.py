@@ -10,8 +10,8 @@ from threshold_helpers import clean_strings
 
 
 def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, run_dual, show):
-    ng_lower = lower_threshold / 100
-    ng_upper = upper_threshold / 100
+    ng_lower = lower_threshold / 1000
+    ng_upper = upper_threshold / 1000
 
     all_files = glob.glob('{}/*.csv'.format(input_dir))
     big_df = []
@@ -57,6 +57,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
     pv_df = pv_df[val_cols + ['PCR_pos', 'sample_id']]
 
     if run_single:
+        print('Running single plots')
         value_list = [(den_df, 'PCR+ pLDH', 'density_plot'), (feb_df, 'Febrile PCR+ pLDH', 'febrile_plot'),
                       (feb_pf_df, 'Febrile Pf+ PCR+ pLDH', 'febrile_pf_plot'),
                       (feb_pv_df, 'Febrile Pv+ PCR+ pLDH', 'febrile_pv_plot'),
@@ -110,64 +111,65 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
             plt.close()
             pp.close()
 
-        if run_dual:
-            for feb_df, non_feb_df, species in [(feb_pf_df, non_feb_pf_df, 'Pf'), (feb_pv_df, non_feb_pv_df, 'Pv')]:
-                x1 = feb_df['quansys_LDH_Pan_pg_ml'].values
-                x2 = non_feb_df['quansys_LDH_Pan_pg_ml'].values
+    if run_dual:
+        print('Running dual plots')
+        for feb_df, non_feb_df, species in [(feb_pf_df, non_feb_pf_df, 'Pf'), (feb_pv_df, non_feb_pv_df, 'Pv')]:
+            x1 = feb_df['quansys_LDH_Pan_pg_ml'].values
+            x2 = non_feb_df['quansys_LDH_Pan_pg_ml'].values
 
-                sub = feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)]
-                sub = sub.loc[sub['quansys_LDH_Pan_pg_ml'] < np.log10(upper_threshold)]
-                sub = len(sub)
-                below = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] < np.log10(lower_threshold)])
-                above = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)])
-                ten_above = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(upper_threshold)])
-                total = len(feb_df)
+            sub = feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)]
+            sub = sub.loc[sub['quansys_LDH_Pan_pg_ml'] < np.log10(upper_threshold)]
+            sub = len(sub)
+            below = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] < np.log10(lower_threshold)])
+            above = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)])
+            ten_above = len(feb_df.loc[feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(upper_threshold)])
+            total = len(feb_df)
 
-                title1 = '''Febrile {sp}+:\n{s}/{t} samples fall between {lt} and {ut} ng/ml (~{st}%)
-                {b}/{t} samples fall below {lt} ng/ml (~{bt}%)\n{a}/{t} samples fall above {lt} ng/ml(~{at}%)
-                {ta}/{t} samples fall above {ut} ng/ml (~{tat}%)'''.format(sp=species, s=sub, t=total, lt=ng_lower,
-                                                                           ut=ng_upper, b=below, ta=ten_above, a=above,
-                                                                           st=np.round(100 * (sub / total), 1),
-                                                                           bt=np.round(100 * (below / total), 1),
-                                                                           at=np.round(100 * (above / total), 1),
-                                                                           tat=np.round(100 * (ten_above / total), 1))
+            title1 = '''Febrile {sp}+:\n{s}/{t} samples fall between {lt} and {ut} ng/ml (~{st}%)
+            {b}/{t} samples fall below {lt} ng/ml (~{bt}%)\n{a}/{t} samples fall above {lt} ng/ml(~{at}%)
+            {ta}/{t} samples fall above {ut} ng/ml (~{tat}%)'''.format(sp=species, s=sub, t=total, lt=ng_lower,
+                                                                       ut=ng_upper, b=below, ta=ten_above, a=above,
+                                                                       st=np.round(100 * (sub / total), 1),
+                                                                       bt=np.round(100 * (below / total), 1),
+                                                                       at=np.round(100 * (above / total), 1),
+                                                                       tat=np.round(100 * (ten_above / total), 1))
 
-                sub = non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)]
-                sub = sub.loc[sub['quansys_LDH_Pan_pg_ml'] < np.log10(upper_threshold)]
-                sub = len(sub)
-                below = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] < np.log10(lower_threshold)])
-                above = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)])
-                ten_above = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(upper_threshold)])
-                total = len(non_feb_df)
+            sub = non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)]
+            sub = sub.loc[sub['quansys_LDH_Pan_pg_ml'] < np.log10(upper_threshold)]
+            sub = len(sub)
+            below = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] < np.log10(lower_threshold)])
+            above = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)])
+            ten_above = len(non_feb_df.loc[non_feb_df['quansys_LDH_Pan_pg_ml'] > np.log10(upper_threshold)])
+            total = len(non_feb_df)
 
-                title2 = '''log10 pLDH pg/ml\n\nNon-febrile {sp}+:
-                {s}/{t} samples fall between {lt} and {ut} ng/ml (~{st}%)
-                {b}/{t} samples fall below {lt} ng/ml (~{bt}%)\n{a}/{t} samples fall above {lt} ng/ml(~{at}%)
-                {ta}/{t} samples fall above {ut} ng/ml (~{tat}%)'''.format(sp=species, t=total, s=sub, lt=ng_lower,
-                                                                           ut=ng_upper, a=above, ta=ten_above, b=below,
-                                                                           st=np.round(100 * (sub / total), 1),
-                                                                           bt=np.round(100 * (below / total), 1),
-                                                                           at=np.round(100 * (above / total), 1),
-                                                                           tat=np.round(100 * (ten_above / total), 1))
+            title2 = '''log10 pLDH pg/ml\n\nNon-febrile {sp}+:
+            {s}/{t} samples fall between {lt} and {ut} ng/ml (~{st}%)
+            {b}/{t} samples fall below {lt} ng/ml (~{bt}%)\n{a}/{t} samples fall above {lt} ng/ml(~{at}%)
+            {ta}/{t} samples fall above {ut} ng/ml (~{tat}%)'''.format(sp=species, t=total, s=sub, lt=ng_lower,
+                                                                       ut=ng_upper, a=above, ta=ten_above, b=below,
+                                                                       st=np.round(100 * (sub / total), 1),
+                                                                       bt=np.round(100 * (below / total), 1),
+                                                                       at=np.round(100 * (above / total), 1),
+                                                                       tat=np.round(100 * (ten_above / total), 1))
 
-                pp = PdfPages('{}/combined_{}.pdf'.format(output_dir, species))
-                ax = sns.distplot(x1, hist=False, color='b', label='Febrile')
-                sns.distplot(x2, hist=False, color='k', label='Non-febrile')
-                ax.axvline(np.log10(lower_threshold), color='r')
-                ax.axvline(np.log10(upper_threshold), color='g')
-                ax.set_ylim(0, 0.6)
-                ax.legend()
-                ax.set_ylabel('Density')
-                ax.set_xlabel(title2, fontsize=12)
-                plt.xticks([-1, 0, 1, 2, 3, 4, 6, 8], [0.1, 1, 10, 100, 1000, 10000, 1000000, 100000000])
-                f = ax.get_figure()
-                plt.title(title1)
-                plt.tight_layout()
-                if show:
-                    plt.show()
-                pp.savefig(f)
-                plt.close()
-                pp.close()
+            pp = PdfPages('{}/combined_{}.pdf'.format(output_dir, species))
+            ax = sns.distplot(x1, hist=False, color='b', label='Febrile')
+            sns.distplot(x2, hist=False, color='k', label='Non-febrile')
+            ax.axvline(np.log10(lower_threshold), color='r')
+            ax.axvline(np.log10(upper_threshold), color='g')
+            ax.set_ylim(0, 0.6)
+            ax.legend()
+            ax.set_ylabel('Density')
+            ax.set_xlabel(title2, fontsize=12)
+            plt.xticks([-1, 0, 1, 2, 3, 4, 6, 8], [0.1, 1, 10, 100, 1000, 10000, 1000000, 100000000])
+            f = ax.get_figure()
+            plt.title(title1)
+            plt.tight_layout()
+            if show:
+                plt.show()
+            pp.savefig(f)
+            plt.close()
+            pp.close()
 
 
 if __name__ == '__main__':
