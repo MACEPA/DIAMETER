@@ -86,7 +86,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
                                                                        at=np.round(100 * (above / total), 1),
                                                                        tat=np.round(100 * (ten_above / total), 1))
 
-            pp = PdfPages('{}/{}.pdf'.format(output_dir, plot_title))
+            pp = PdfPages('{}/{}_{}ng_{}ng.pdf'.format(output_dir, plot_title, ng_lower, ng_upper))
             ax = sns.distplot(x, hist=False, color='k')
             ln = ax.lines[0]
             y = ln.get_ydata()
@@ -152,7 +152,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
                                                                        at=np.round(100 * (above / total), 1),
                                                                        tat=np.round(100 * (ten_above / total), 1))
 
-            pp = PdfPages('{}/combined_{}.pdf'.format(output_dir, species))
+            pp = PdfPages('{}/combined_{}_{}ng_{}ng.pdf'.format(output_dir, species, ng_lower, ng_upper))
             ax = sns.distplot(x1, hist=False, color='b', label='Febrile')
             sns.distplot(x2, hist=False, color='k', label='Non-febrile')
             ax.axvline(np.log10(lower_threshold), color='r')
