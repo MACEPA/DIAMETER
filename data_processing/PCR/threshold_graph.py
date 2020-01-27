@@ -9,7 +9,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from threshold_helpers import clean_strings
 
 
-def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, run_dual):
+def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, run_dual, show):
     ng_lower = lower_threshold / 100
     ng_upper = upper_threshold / 100
 
@@ -104,7 +104,8 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
             f = ax.get_figure()
             plt.title(title)
             plt.tight_layout()
-            plt.show()
+            if show:
+                plt.show()
             pp.savefig(f)
             plt.close()
             pp.close()
@@ -162,7 +163,8 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
                 f = ax.get_figure()
                 plt.title(title1)
                 plt.tight_layout()
-                plt.show()
+                if show:
+                    plt.show()
                 pp.savefig(f)
                 plt.close()
                 pp.close()
@@ -181,9 +183,11 @@ if __name__ == '__main__':
     parser.add_argument('-ut', '--upper_threshold', type=int,
                         default=10000, help='Upper threshold, in pg')
     parser.add_argument('-rs', '--run_single', action='store_true',
-                        help='Whether or not to produce single density graphs')
+                        help='Produce single density graphs')
     parser.add_argument('-rd', '--run_dual', action='store_true',
-                        help='Whether or not to produce dual density graphs')
+                        help='Produce dual density graphs')
+    parser.add_argument('-s', '--show', action='store_true',
+                        help='Show graphs as they run')
     args = parser.parse_args()
     main(input_dir=args.input_dir, output_dir=args.output_dir, lower_threshold=args.lower_threshold,
-         upper_threshold=args.upper_threshold, run_single=args.run_single, run_dual=args.run_dual)
+         upper_threshold=args.upper_threshold, run_single=args.run_single, run_dual=args.run_dual, show=args.show)
