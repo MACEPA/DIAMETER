@@ -167,7 +167,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, run_single, ru
 
                 pp = PdfPages('{}/combined_{}.pdf'.format(output_dir, species))
                 ax = sns.distplot(x1, hist=False, color='b', label='Febrile')
-                ax = sns.distplot(x2, hist=False, color='k', label='Non-febrile')
+                sns.distplot(x2, hist=False, color='k', label='Non-febrile')
                 ax.axvline(np.log10(lower_threshold), color='r')
                 ax.axvline(np.log10(upper_threshold), color='g')
                 ax.set_ylim(0, 0.6)
