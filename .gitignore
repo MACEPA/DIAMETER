@@ -3,3 +3,6 @@
 *.pyc
 data_processing/dummy_graphs.py
 venv/
+ipynbs/processing/.ipynb_checkpoints/
+ipynbs/graphing/.ipynb_checkpoints/
+ipynbs/decay/.ipynb_checkpoints/
