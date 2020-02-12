@@ -1,13 +1,40 @@
 import math
 import numpy as np
+import pandas as pd
+
+
+def read_4plex(input_path, fname):
+    plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
+                            skiprows=8, names=['patient_id', 'type', 'well', 'error',
+                                               'HRP2_pg_ml', 'LDH_Pan_pg_ml',
+                                               'LDH_Pv_pg_ml', 'CRP_ng_ml',
+                                               'fail1', 'fail2'])
+    # certain CSVs have empty extra columns when read in for some reason
+    # they need to be labeled and then dropped
+    plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
+    return plex_data
+
+
+def read_5plex(input_path, fname):
+    plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
+                            skiprows=13, names=['patient_id', 'type', 'well', 'error',
+                                                'HRP2_pg_ml', 'LDH_Pan_pg_ml',
+                                                'LDH_Pv_pg_ml', 'LDH_Pf_pg_ml',
+                                                'CRP_ng_ml'])
+    return plex_data
 
 
 # function for creating decision vector based on antigen value
 # at a specific concentration
-def run_compare(df, analyte_val, dil_val):
+def run_compare(df, analyte_val, dil_val, base, plex):
     above, below, llq, ulq, na = False, False, False, False, False
     val = df[analyte_val]
-    thresh_val = DIL_CONSTANTS[dil_val] * THRESHOLDS[analyte_val]
+    dil_constants = build_dil_constants(base)
+    if plex == 4:
+        thresholds = THRESHOLDS_4PLEX
+    elif plex == 5:
+        thresholds = THRESHOLDS_5PLEX
+    thresh_val = dil_constants[dil_val] * thresholds[analyte_val]
     try:
         float_val = float(val)
         if math.isnan(float_val):
@@ -53,24 +80,34 @@ def return_decisions(low, high, fail='fail'):
 
     # decisions for various analytes
     decisions = {'HRP2_pg_ml': hrp2_matrix, 'LDH_Pan_pg_ml': other_matrix,
-                 'LDH_Pv_pg_ml': other_matrix, 'CRP_ng_ml': other_matrix}
+                 'LDH_Pv_pg_ml': other_matrix, 'LDH_Pf_pg_ml': other_matrix,
+                 'CRP_ng_ml': other_matrix}
     return decisions
 
 
 # function for splitting off time from patient_id string
-def split_time(df):
-    sub = df['patient_id'].split('-')
+def split_time(df, plex):
     try:
-        time = int(sub[2])
-        return time
+        if plex == 4:
+            sub = df['patient_id'].split('-')
+            time = int(sub[2])
+            return time
+        elif plex == 5:
+            sub = df['patient_id'].split('_')
+            time = '_'.join(sub[2:])
+            return time
     except IndexError:
         return 0
 
 
 # function for removing time from patient_id string once it's split
-def remove_time(df):
-    patient = df['patient_id'].split('-')
-    return '{}-{}'.format(patient[0], patient[1])
+def remove_time(df, plex):
+    if plex == 4:
+        patient = df['patient_id'].split('-')
+        return '{}-{}'.format(patient[0], patient[1])
+    elif plex == 5:
+        patient = df['patient_id'].split('_')
+        return '_'.join(patient[0:2])
 
 
 # function for removing 'day' from strings
@@ -80,23 +117,22 @@ def remove_day(x):
     return x
 
 
-# threshhold values for various analytes
-THRESHOLDS = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
-              'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
+# generate dilution constants based on initial dilution value
+def build_dil_constants(base_dil):
+    return {str(base_dil**i): (base_dil**(i-1)) for i in range(1, 10)}
 
-# positivity threshholds for various analytes
-POS_THRESHOLDS = {'HRP2_pg_ml': 2.3, 'LDH_Pan_pg_ml': 47.8,
-                  'LDH_Pv_pg_ml': 75.1, 'CRP_ng_ml': np.nan}
 
-# constant to apply to the threshhold for different dilutions
-DIL_CONSTANTS = {'50': 1, '2500': 50, '125000': 2500,
-                 '6250000': 125000, '312500000': 6250000,
-                 '15625000000': 312500000, '781250000000': 15625000000}
+# generate dilution sets based on initial dilution value
+def build_dil_sets(base_dil):
+    return {str(base_dil**i): (str(base_dil**(i-1)), str(base_dil**1), 'fail') for i in range(1, 10)}
 
-# dilution sets for various dilutions
-DILUTION_SETS = {'50': ('1', '50', 'fail'), '2500': ('50', '2500', 'fail'),
-                 '125000': ('2500', '125000', 'fail'),
-                 '6250000': ('125000', '6250000', 'fail'),
-                 '312500000': ('6250000', '312500000', 'fail'),
-                 '15625000000': ('312500000', '15625000000', 'fail'),
-                 '781250000000': ('15625000000', '781250000000', 'fail')}
+
+# threshhold values for various analytes, 4plex
+THRESHOLDS_4PLEX = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
+                    'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
+
+# threshold values for various analytes, 5plex
+THRESHOLDS_5PLEX = {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000,
+                    'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
+                    'CRP_ng_ml': 38000}
+

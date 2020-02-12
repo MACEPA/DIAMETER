@@ -146,17 +146,10 @@ def decider(base_df):
 
 def main(input_dir):
     dfs = []
-    input_path = '{}/input_data/20190610'.format(input_dir)
+    input_path = '{}/input_data'.format(input_dir)
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
-        plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
-                                skiprows=8, names=['patient_id', 'type', 'well', 'error',
-                                                   'HRP2_pg_ml', 'LDH_Pan_pg_ml',
-                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml',
-                                                   'fail1', 'fail2'])
-        # certain CSVs have empty extra columns when read in for some reason
-        # they need to be labeled and then dropped
-        plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
+        plex_data = read_5plex(input_path, fname)
         # convert all strings to lowercase
         plex_data = plex_data.applymap(lambda x: x.lower() if isinstance(x, str) else x)
         # fill empty patient_ids from the preceeding patient_id
@@ -166,16 +159,16 @@ def main(input_dir):
         dfs.append(plex_data)
     samples_data = pd.concat(dfs)
     # subset data to just what we want
+    samples_data = samples_data.loc[~samples_data['patient_id'].str.contains('ctrl')]
+    samples_data = samples_data.loc[~samples_data['type'].str.contains('replicate')]
     samples_data = samples_data.loc[~samples_data['type'].isnull()]
-    samples_data = samples_data.loc[~samples_data['type'].str.contains('pixel')]
-    samples_data = samples_data.loc[samples_data['patient_id'].str.contains('pa-')]
     samples_data = samples_data.drop('type', axis=1)
     # break out concentration from patient string
-    samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[-1])
-    samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: x.partition(' ')[0])
+    samples_data['concentration'] = samples_data['patient_id'].apply(lambda x: x.split(' ')[-1])
+    samples_data['patient_id'] = samples_data['patient_id'].apply(lambda x: '_'.join(x.split(' ')[:3]).replace('/',
+                                                                                                               '_'))
     # remove concentration values we don't want
-    samples_data = samples_data.loc[(samples_data['concentration'].str.contains('neat|50'))]
-    samples_data = samples_data.loc[~samples_data['concentration'].str.contains('low volume')]
+    samples_data = samples_data.loc[(samples_data['concentration'].str.contains('neat|20'))]
     # remove rows where "well" is null
     samples_data = samples_data.loc[~samples_data['well'].isnull()]
     # make concentrations more machine/human readable
