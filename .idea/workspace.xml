@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ipynbs/processing/namibia_PCR_cleaning.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/namibia_PCR_update_method.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/namibia_PCR_update_method.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
