@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/data_processing/namibia/combo_data_processing_helpers_WIP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/namibia/4plex_data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/namibia/4plex_data_processing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/namibia/5plex_data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/namibia/combo_data_processing_WIP.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_processing/namibia/data_processing_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/namibia/data_processing_helpers.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,11 +34,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
-    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/Continuum/anaconda3/python.exe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/data_processing/namibia" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\lzoeckler\PycharmProjects\DIAMETER\data_processing\namibia" />
       <recent name="C:\Users\lzoeckler\PycharmProjects\DIAMETER" />
     </key>
   </component>
