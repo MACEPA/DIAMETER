@@ -6,7 +6,7 @@ from functools import partial, reduce
 # import helper functions
 from data_processing_helpers import (run_compare, return_decisions,
                                      fix_concentrations, split_time,
-                                     remove_time, remove_day, read_data)
+                                     remove_time, read_data)
 # import constants
 from data_processing_helpers import THRESHOLDS
 
@@ -160,9 +160,9 @@ def decider(base_df, plex, base_dil):
     return decided
 
 
-def main(input_dir, plex, base_dil):
+def main(input_dir, input_folder, plex, base_dil):
     dfs = []
-    input_path = '{}/input_data/20190610'.format(input_dir)
+    input_path = '{}/input_data/{}'.format(input_dir, input_folder)
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
         read_data(input_path, fname, plex)
@@ -208,27 +208,42 @@ def main(input_dir, plex, base_dil):
     no_duplicates = pd.concat([no_duplicates, deduped])
     # run decision function
     output_df = decider(no_duplicates)
-    # split time associated with patient_id into its own column
-    output_df['time_point_days'] = output_df.apply(split_time, axis=1, plex=plex)
-    output_df['patient_id'] = output_df.apply(remove_time, axis=1, plex=plex)
-    # sort values and output to a csv
-    output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
-    output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
-    output_df.to_csv('{}/output_data/final_dilutions.csv'.format(input_dir))
+    if plex == 4:
+        # split time associated with patient_id into its own column
+        output_df['time_point_days'] = output_df.apply(split_time, axis=1)
+        output_df['patient_id'] = output_df.apply(remove_time, axis=1)
+        # sort values
+        output_df.sort_values(['patient_id', 'time_point_days'], inplace=True)
+        output_df.set_index(['patient_id', 'time_point_days'], inplace=True)
+    elif plex == 5:
+        # sort values and output to a csv
+        output_df.sort_values('patient_id', inplace=True)
+        output_df.set_index('patient_id', inplace=True)
+    output_df.to_csv('{}/output_data/{}_final_dilutions.csv'.format(input_dir, input_folder))
     # also output a csv of partially formatted data, for vetting
     partial_format = samples_data.copy(deep=True)
-    partial_format['time_point_days'] = partial_format.apply(split_time, axis=1, plex=plex)
-    partial_format['patient_id'] = partial_format.apply(remove_time, axis=1, plex=plex)
-    partial_format.sort_values(['patient_id', 'time_point_days'], inplace=True)
-    partial_format.set_index(['patient_id', 'time_point_days'], inplace=True)
-    partial_format.to_csv('{}/output_data/partially_formatted.csv'.format(input_dir))
+    if plex == 4:
+        # split time associated with patient_id into its own column
+        partial_format['time_point_days'] = partial_format.apply(split_time, axis=1)
+        partial_format['patient_id'] = partial_format.apply(remove_time, axis=1)
+        # sort values
+        partial_format.sort_values(['patient_id', 'time_point_days'], inplace=True)
+        partial_format.set_index(['patient_id', 'time_point_days'], inplace=True)
+    elif plex == 5:
+        # sort values
+        partial_format.sort_values('patient_id', inplace=True)
+        partial_format.set_index('patient_id', inplace=True)
+    partial_format.to_csv('{}/output_data/{}_partially_formatted.csv'.format(input_dir, input_folder))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--input_dir', type=str,
-                        default='C:/Users/lzoeckler/Desktop/4plex',
+                        default='C:/Users/lzoeckler/Desktop/5plex',
                         help='Input directory')
+    parser.add_argument('-if', '--input_folder', type=str,
+                        default='menzies_raw',
+                        help='name of folder within input_dir containing data')
     parser.add_argument('-p', '--plex', type=int,
                         default=5,
                         help="4plex vs 5plex (or any future nplex)")
@@ -236,4 +251,4 @@ if __name__ == '__main__':
                         default=50,
                         help='Base dilution value beyond neat (1)')
     args = parser.parse_args()
-    main(input_dir=args.input_dir, plex=args.plex, base_dil=args.base_dil)
+    main(input_dir=args.input_dir, input_folder=args.input_folder, plex=args.plex, base_dil=args.base_dil)

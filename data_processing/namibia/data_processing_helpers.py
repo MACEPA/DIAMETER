@@ -124,10 +124,6 @@ def build_dil_sets(base_dil):
 
 
 # threshhold values for various analytes
-THRESHOLDS = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
-              'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
-
-# 5plex threshold values
-THRESHOLDS_5PLEX = {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000,
-                    'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
-                    'CRP_ng_ml': 38000}
+THRESHOLDS = {4: {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514, 'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574},
+              5: {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000, 'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
+                  'CRP_ng_ml': 38000}}

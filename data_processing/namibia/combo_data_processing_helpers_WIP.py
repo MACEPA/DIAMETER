@@ -82,28 +82,19 @@ def return_decisions(low, high, fail='fail'):
 
 
 # function for splitting off time from patient_id string
-def split_time(df, plex):
+def split_time(df):
     try:
-        if plex == 4:
-            sub = df['patient_id'].split('-')
-            time = int(sub[2])
-            return time
-        elif plex == 5:
-            sub = df['patient_id'].split('_')
-            time = '_'.join(sub[2:])
-            return time
+        sub = df['patient_id'].split('-')
+        time = int(sub[2])
+        return time
     except IndexError:
         return 0
 
 
 # function for removing time from patient_id string once it's split
-def remove_time(df, plex):
-    if plex == 4:
-        patient = df['patient_id'].split('-')
-        return '{}-{}'.format(patient[0], patient[1])
-    elif plex == 5:
-        patient = df['patient_id'].split('_')
-        return '_'.join(patient[0:2])
+def remove_time(df):
+    patient = df['patient_id'].split('-')
+    return '{}-{}'.format(patient[0], patient[1])
 
 
 # function for removing 'day' from strings

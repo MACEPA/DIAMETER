@@ -5,11 +5,9 @@ import pandas as pd
 from functools import partial, reduce
 # import helper functions
 from data_processing_helpers import (run_compare, return_5plex_decisions,
-                                     fix_concentrations, split_time,
-                                     remove_time, remove_day,
-                                     build_dil_constants)
+                                     fix_concentrations, build_dil_constants)
 # import constants
-from data_processing_helpers import THRESHOLDS_5PLEX
+from data_processing_helpers import THRESHOLDS
 
 
 # function for determining which dilution value to use
@@ -21,7 +19,7 @@ def decider(base_df, base_dil):
     # create an empty dictionary to fill with errors associated with patient IDs
     error_pids = {}
     # iterate over analytes
-    for analyte in THRESHOLDS_5PLEX.keys():
+    for analyte in THRESHOLDS[5].keys():
         patient_dfs = []
         # iterate over patient_ids
         for pid in base_df['patient_id'].unique():

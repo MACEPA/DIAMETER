@@ -17,7 +17,7 @@ def deduplicate(duplicate_df):
     # create an empty list to fill with small dfs, which will be combined
     deduped_dfs = []
     # iterate over analytes
-    for analyte in THRESHOLDS.keys():
+    for analyte in THRESHOLDS[4].keys():
         # subset to columns of interest
         dup_analyte = duplicate_df[['patient_id', 'well', 'error', 'concentration', analyte]]
         pid_dfs = []
@@ -80,7 +80,7 @@ def decider(base_df, base_dil):
     # create an empty dictionary to fill with errors associated with patient IDs
     error_pids = {}
     # iterate over analytes
-    for analyte in THRESHOLDS.keys():
+    for analyte in THRESHOLDS[4].keys():
         patient_dfs = []
         # iterate over patient_ids
         for pid in base_df['patient_id'].unique():
