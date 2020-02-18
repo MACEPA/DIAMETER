@@ -3,24 +3,24 @@ import numpy as np
 import pandas as pd
 
 
-def read_4plex(input_path, fname):
-    plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
-                            skiprows=8, names=['patient_id', 'type', 'well', 'error',
-                                               'HRP2_pg_ml', 'LDH_Pan_pg_ml',
-                                               'LDH_Pv_pg_ml', 'CRP_ng_ml',
-                                               'fail1', 'fail2'])
-    # certain CSVs have empty extra columns when read in for some reason
-    # they need to be labeled and then dropped
-    plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
-    return plex_data
-
-
-def read_5plex(input_path, fname):
-    plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
-                            skiprows=13, names=['patient_id', 'type', 'well', 'error',
-                                                'HRP2_pg_ml', 'LDH_Pan_pg_ml',
-                                                'LDH_Pv_pg_ml', 'LDH_Pf_pg_ml',
-                                                'CRP_ng_ml'])
+def read_data(input_path, fname, plex):
+    if plex == 4:
+        plex_data = pd.read_csv('{}/{}'.format(input_path, fname), index_col=False,
+                                skiprows=8, names=['patient_id', 'type', 'well', 'error',
+                                                   'HRP2_pg_ml', 'LDH_Pan_pg_ml',
+                                                   'LDH_Pv_pg_ml', 'CRP_ng_ml',
+                                                   'fail1', 'fail2'])
+        # certain CSVs have empty extra columns when read in for some reason
+        # they need to be labeled and then dropped
+        plex_data.drop(['fail1', 'fail2'], axis=1, inplace=True)
+    elif plex == 5:
+        plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
+                                skiprows=13, names=['patient_id', 'type', 'well', 'error',
+                                                    'HRP2_pg_ml', 'LDH_Pan_pg_ml',
+                                                    'LDH_Pv_pg_ml', 'LDH_Pf_pg_ml',
+                                                    'CRP_ng_ml'])
+    else:
+        raise ValueError("Unexpected plex value: {}".format(plex))
     return plex_data
 
 
@@ -30,11 +30,7 @@ def run_compare(df, analyte_val, dil_val, base, plex):
     above, below, llq, ulq, na = False, False, False, False, False
     val = df[analyte_val]
     dil_constants = build_dil_constants(base)
-    if plex == 4:
-        thresholds = THRESHOLDS_4PLEX
-    elif plex == 5:
-        thresholds = THRESHOLDS_5PLEX
-    thresh_val = dil_constants[dil_val] * thresholds[analyte_val]
+    thresh_val = dil_constants[dil_val] * THRESHOLDS[plex][analyte_val]
     try:
         float_val = float(val)
         if math.isnan(float_val):
@@ -127,12 +123,7 @@ def build_dil_sets(base_dil):
     return {str(base_dil**i): (str(base_dil**(i-1)), str(base_dil**1), 'fail') for i in range(1, 10)}
 
 
-# threshhold values for various analytes, 4plex
-THRESHOLDS_4PLEX = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
-                    'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
-
-# threshold values for various analytes, 5plex
-THRESHOLDS_5PLEX = {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000,
-                    'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
-                    'CRP_ng_ml': 38000}
-
+# threshhold values for various analytes, 4plex and 5plex
+THRESHOLDS = {4: {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514, 'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574},
+              5: {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000, 'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
+                  'CRP_ng_ml': 38000}}

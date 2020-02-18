@@ -77,6 +77,8 @@ def decider(base_df, base_dil):
     dil_cons = build_dil_constants(base_dil)
     # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
+    # create an empty dictionary to fill with errors associated with patient IDs
+    error_pids = {}
     # iterate over analytes
     for analyte in THRESHOLDS.keys():
         patient_dfs = []
@@ -122,6 +124,7 @@ def decider(base_df, base_dil):
                     val = 'fail'
                     well = 'fail'
                     error = np.nan
+                    error_pids[pid] = '{} failure'.format(analyte)
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
                 # preserve the unselected dilutions
@@ -145,6 +148,19 @@ def decider(base_df, base_dil):
         patient_df['errors'] = patient_df['errors'].astype('object')
         analyte_dfs.append(patient_df)
     decided = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    # loop through associated error/patient ID pairs
+    for pid in error_pids.keys():
+        # subset to individual error(s) associated to patient ID
+        error = error_pids[pid]
+        # subset dataframe to patient ID where error occurs
+        pid_df = decided.loc[decided['patient_id'] == pid]
+        # combine all the errors into one big error message
+        pid_df['errors'] = pid_df['errors'].apply(lambda x: error if np.isnan(x) else x + ' ' + error)
+        # if there's actually an error...
+        if len(pid_df) > 0:
+            # ...replace current dataframe info with the info that contains the error
+            decided = decided.loc[decided['patient_id'] != pid]
+            decided = decided.append(pid_df)
     return decided
 
 

@@ -25,6 +25,27 @@ def run_compare(df, dil_constants, analyte_val, dil_val):
         return np.array([above, below, llq, ulq, na])
 
 
+def run_5plex_compare(df, dil_constants, analyte_val, dil_val):
+    real, llq, ulq, na = False, False, False, False
+    val = df[analyte_val]
+    thresh_val = dil_constants[dil_val] * THRESHOLDS_5PLEX[analyte_val]
+    try:
+        float_val = float(val)
+        if math.isnan(float_val):
+            na = True
+        elif float_val > .90*thresh_val:
+            ulq = True
+        else:
+            real = True
+    except ValueError:
+        if '<' in val:
+            llq = True
+        elif '>' in val:
+            ulq = True
+    finally:
+        return np.array([real, llq, ulq, na])
+
+
 # function for cleaning concentration info
 def fix_concentrations(df):
     con = df['concentration'].partition(':')[2]
@@ -44,16 +65,28 @@ def return_decisions(low, high, fail='fail'):
                             [high, low, low, fail, fail],
                             [high, high, fail, high, high],
                             [fail, high, high, fail, fail]])
-
     other_matrix = np.array([[high, low, low, high, high],
                              [high, low, low, high, fail],
                              [high, low, low, fail, fail],
                              [high, low, fail, high, high],
                              [fail, low, low, fail, fail]])
-
     # decisions for various analytes
     decisions = {'HRP2_pg_ml': hrp2_matrix, 'LDH_Pan_pg_ml': other_matrix,
                  'LDH_Pv_pg_ml': other_matrix, 'CRP_ng_ml': other_matrix}
+    return decisions
+
+
+def return_5plex_decisions(low, high, fail='fail'):
+    # Columns = neat: [real #, LLQ, ULQ or within 10% ULQ, NA]
+    # Rows = dilution: [real #, LLQ, ULQ or within 10% ULQ, NA]
+    decision_matrix = np.array([[low, low, high, fail],
+                                [low, low, fail, fail],
+                                [fail, fail, high, fail],
+                                [fail, fail, fail, fail]])
+    # decisions for various analytes
+    decisions = {'HRP2_pg_ml': decision_matrix, 'LDH_Pan_pg_ml': decision_matrix,
+                 'LDH_Pv_pg_ml': decision_matrix, 'LDH_Pf_pg_ml': decision_matrix,
+                 'CRP_ng_ml': decision_matrix}
     return decisions
 
 
@@ -93,3 +126,8 @@ def build_dil_sets(base_dil):
 # threshhold values for various analytes
 THRESHOLDS = {'HRP2_pg_ml': 330, 'LDH_Pan_pg_ml': 10514,
               'LDH_Pv_pg_ml': 497, 'CRP_ng_ml': 9574}
+
+# 5plex threshold values
+THRESHOLDS_5PLEX = {'HRP2_pg_ml': 2800, 'LDH_Pan_pg_ml': 67000,
+                    'LDH_Pv_pg_ml': 19200, 'LDH_Pf_pg_ml': 20800,
+                    'CRP_ng_ml': 38000}
