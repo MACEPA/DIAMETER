@@ -76,17 +76,23 @@ def return_decisions(low, high, fail='fail'):
     return decisions
 
 
-def return_5plex_decisions(low, high, fail='fail'):
-    # Columns = neat: [real #, LLQ, ULQ or within 10% ULQ, NA]
-    # Rows = dilution: [real #, LLQ, ULQ or within 10% ULQ, NA]
-    decision_matrix = np.array([[low, low, high, fail],
-                                [low, low, fail, fail],
-                                [fail, fail, high, fail],
-                                [fail, fail, fail, fail]])
+def return_decisions(low, high, fail='fail'):
+    # Columns = neat: [LLQ, real #, ULQ or within 20% ULQ, NA]
+    # Rows = dilution: [LLQ or within 20x LLQ, real #, ULQ or within 20% ULQ, NA]
+#     hrp2_matrix = np.array([[low, low, fail, fail],
+#                             [low, low, fail, fail],
+#                             [fail, fail, high, fail],
+#                             [fail, fail, fail, fail]])
+    # For HRP2 assay only. If Neat value is less than 100, 20x value is
+    # more than 10x of neat value or more than ULOQ, set "Alert"
+    other_matrix = np.array([[low, low, fail, fail],
+                             [low, low, high, fail],
+                             [fail, fail, high, fail],
+                             [fail, fail, fail, fail]])
     # decisions for various analytes
-    decisions = {'HRP2_pg_ml': decision_matrix, 'LDH_Pan_pg_ml': decision_matrix,
-                 'LDH_Pv_pg_ml': decision_matrix, 'LDH_Pf_pg_ml': decision_matrix,
-                 'CRP_ng_ml': decision_matrix}
+    decisions = {'HRP2_pg_ml': other_matrix, 'LDH_Pan_pg_ml': other_matrix,
+                 'LDH_Pv_pg_ml': other_matrix, 'LDH_Pf_pg_ml': other_matrix,
+                 'CRP_ng_ml': other_matrix}
     return decisions
 
 
