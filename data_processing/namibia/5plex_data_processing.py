@@ -4,8 +4,9 @@ import numpy as np
 import pandas as pd
 from functools import partial, reduce
 # import helper functions
-from data_processing_helpers import (run_compare, return_5plex_decisions,
-                                     fix_concentrations, build_dil_constants)
+from data_processing_helpers import (run_5plex_compare, return_5plex_decisions,
+                                     fix_concentrations, build_dil_constants,
+                                     set_hrp2_alerts)
 # import constants
 from data_processing_helpers import THRESHOLDS
 
@@ -29,30 +30,36 @@ def decider(base_df, base_dil):
             # set initial best decision to neat (1)
             best_decision = '1'
             # iterate over dilution values
-            for max_dilution in dilution_values:
+            for current_dilution in dilution_values:
                 # subset to dilutions
-                dil_data = patient_data.loc[patient_data['concentration'].isin([best_decision, max_dilution])]
+                best_dil_data = patient_data.loc[patient_data['concentration'].isin([best_decision])]
+                current_dil_data = patient_data.loc[patient_data['concentration'].isin([current_dilution])]
                 # create partial function for generating decision vectors
-                partial_compare = partial(run_compare, dil_constants=dil_cons, analyte_val=analyte,
-                                          dil_val=max_dilution)
+                partial_compare_best = partial(run_5plex_compare, analyte_val=analyte, dil_val=best_decision)
+                partial_compare_current = partial(run_5plex_compare, analyte_val=analyte, dil_val=current_dilution)
                 # generate decision vectors
-                dil_data['decision_vector'] = dil_data.apply(partial_compare, axis=1)
+                best_dil_data['decision_vector'] = best_dil_data.apply(partial_compare_best, axis=1)
+                current_dil_data['decision_vector'] = current_dil_data.apply(partial_compare_current, axis=1)
                 # pull decision matrix for given analyte and concentrations
-                decisions = return_5plex_decisions(best_decision, max_dilution)
+                decisions = return_5plex_decisions(best_decision, current_dilution)
                 decision_matrix = decisions[analyte]
                 # construct empty dataframe to hold best values
                 best_df = pd.DataFrame(columns=['patient_id', 'errors', analyte,
                                                 '{}_dilution'.format(analyte),
                                                 '{}_well'.format(analyte)])
                 # get decision vectors for each possible decision
-                vector_low = dil_data.loc[dil_data['concentration'] == best_decision,
-                                          'decision_vector'].item()
-                vector_high = dil_data.loc[dil_data['concentration'] == max_dilution,
-                                           'decision_vector'].item()
+                vector_best = best_dil_data.loc[best_dil_data['concentration'] == best_decision,
+                                                'decision_vector'].item()
+                vector_current = current_dil_data.loc[current_dil_data['concentration'] == current_dilution,
+                                                      'decision_vector'].item()
                 # get actual decision from decision vectors
-                decision = decision_matrix[vector_high, vector_low].item()
+                decision = decision_matrix[vector_current, vector_best].item()
                 # set value, well, and error based on decision
-                if decision in [best_decision, max_dilution]:
+                if decision in [best_decision, current_dilution]:
+                    if decision == best_decision:
+                        dil_data = best_dil_data
+                    elif decision == current_dilution:
+                        dil_data = current_dil_data
                     val = dil_data.loc[dil_data['concentration'] == decision,
                                        analyte].item()
                     well = dil_data.loc[dil_data['concentration'] == decision,
@@ -88,6 +95,13 @@ def decider(base_df, base_dil):
         analyte_dfs.append(patient_df)
     # combine all individual analyte dataframes into one dataframe
     decided = reduce(lambda left, right: pd.merge(left, right, on='patient_id'), analyte_dfs)
+    # set HRP2 hook effect alerts
+    alert_df = set_hrp2_alerts(decided)
+    alert_patients = alert_df['patient_id'].tolist()
+    # subset to non-alert patients, then...
+    decided = decided.loc[~decided['patient_id'].isin(alert_patients)]
+    # recombine with correctly flagged alerts
+    decided = pd.concat([alert_df, decided])
     # loop through associated error/patient ID pairs
     for pid in error_pids.keys():
         # subset to individual error(s) associated to patient ID
