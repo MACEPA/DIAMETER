@@ -70,7 +70,10 @@ def decider(base_df, base_dil):
                     val = 'fail'
                     well = 'fail'
                     error = np.nan
-                    error_pids[pid] = '{} failure'.format(analyte)
+                    try:
+                        error_pids[pid] += ', {} failure'.format(analyte)
+                    except KeyError:
+                        error_pids[pid] = '{} failure'.format(analyte)
                 else:
                     raise ValueError("Unexpected decision value: {}".format(decision))
                 # preserve the unselected dilutions

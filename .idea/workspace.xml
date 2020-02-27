@@ -4,7 +4,7 @@
     <list default="true" id="a86ad796-7908-40ca-bd42-c12db16238ff" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_processing/namibia/5plex_data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/namibia/5plex_data_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_processing/namibia/data_processing_helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_processing/namibia/data_processing_helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ipynbs/processing/5plex_data_processing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/ipynbs/processing/5plex_data_processing.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
