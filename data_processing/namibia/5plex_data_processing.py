@@ -70,6 +70,8 @@ def decider(base_df, base_dil):
                     val = 'fail'
                     well = 'fail'
                     error = np.nan
+                    # if it's a fail case, add the error to the list of errors
+                    # for the specific patient ID
                     try:
                         error_pids[pid] += ', {} failure'.format(analyte)
                     except KeyError:

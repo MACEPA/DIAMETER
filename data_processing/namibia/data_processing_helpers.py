@@ -4,11 +4,12 @@ import pandas as pd
 
 
 # function for creating decision vector based on antigen value
-# at a specific concentration
+# at a specific concentration, 4plex
 def run_compare(df, dil_constants, analyte_val, dil_val):
     above, below, llq, ulq, na = False, False, False, False, False
     val = df[analyte_val]
     thresh_val = dil_constants[dil_val] * THRESHOLDS[4]['ulq'][analyte_val]
+    # set truth vector based on value (order is important)
     try:
         float_val = float(val)
         if math.isnan(float_val):
@@ -26,6 +27,8 @@ def run_compare(df, dil_constants, analyte_val, dil_val):
         return np.array([above, below, llq, ulq, na])
 
 
+# function for creating decision vector based on antigen value
+# at a specific concentration, 5plex
 def run_5plex_compare(df, analyte_val, dil_val):
     # Columns = neat: [LLQ, real #, ULQ or within 20% ULQ, NA]
     # Rows = dilution: [LLQ or within 20x LLQ, real #, ULQ or within 20% ULQ, NA]
@@ -33,6 +36,7 @@ def run_5plex_compare(df, analyte_val, dil_val):
     val = df[analyte_val]
     ulq_val = int(dil_val) * THRESHOLDS[5]['ulq'][analyte_val]
     llq_val = int(dil_val) * THRESHOLDS[5]['llq'][analyte_val]
+    # set truth vector based on value (order is important)
     try:
         float_val = float(val)
         if math.isnan(float_val):
