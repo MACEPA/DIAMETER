@@ -4,11 +4,10 @@ import numpy as np
 import pandas as pd
 from functools import partial, reduce
 # import helper functions
-from data_processing_helpers import (run_5plex_compare, return_5plex_decisions,
-                                     fix_concentrations, build_dil_constants,
-                                     set_hrp2_alerts)
+from fiveplex_processing_helpers import run_compare, return_decisions, set_hrp2_alerts
+from core_processing_helpers import fix_concentrations, build_dil_constants
 # import constants
-from data_processing_helpers import THRESHOLDS
+from core_processing_helpers import THRESHOLDS
 
 
 # function for determining which dilution value to use
@@ -35,13 +34,13 @@ def decider(base_df, base_dil):
                 best_dil_data = patient_data.loc[patient_data['concentration'].isin([best_decision])]
                 current_dil_data = patient_data.loc[patient_data['concentration'].isin([current_dilution])]
                 # create partial function for generating decision vectors
-                partial_compare_best = partial(run_5plex_compare, analyte_val=analyte, dil_val=best_decision)
-                partial_compare_current = partial(run_5plex_compare, analyte_val=analyte, dil_val=current_dilution)
+                partial_compare_best = partial(run_compare, analyte_val=analyte, dil_val=best_decision)
+                partial_compare_current = partial(run_compare, analyte_val=analyte, dil_val=current_dilution)
                 # generate decision vectors
                 best_dil_data['decision_vector'] = best_dil_data.apply(partial_compare_best, axis=1)
                 current_dil_data['decision_vector'] = current_dil_data.apply(partial_compare_current, axis=1)
                 # pull decision matrix for given analyte and concentrations
-                decisions = return_5plex_decisions(best_decision, current_dilution)
+                decisions = return_decisions(best_decision, current_dilution)
                 decision_matrix = decisions[analyte]
                 # construct empty dataframe to hold best values
                 best_df = pd.DataFrame(columns=['patient_id', 'errors', analyte,
