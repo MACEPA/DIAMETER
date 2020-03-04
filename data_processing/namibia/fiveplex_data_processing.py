@@ -67,7 +67,7 @@ def decider(base_df, base_dil):
                                          'error'].item()
                 elif decision == 'fail':
                     val = 'fail'
-                    well = 'fail'
+                    well = np.nan
                     error = np.nan
                     # if it's a fail case, add the error to the list of errors
                     # for the specific patient ID
@@ -124,7 +124,7 @@ def decider(base_df, base_dil):
 
 def main(input_dir, base_dil):
     dfs = []
-    input_path = '{}/input_data/20190610'.format(input_dir)
+    input_path = '{}/input_data'.format(input_dir)
     # get all input data, combine into one df
     for fname in os.listdir(input_path):
         plex_data = pd.read_csv('{}/{}'.format(input_path, fname),
@@ -172,7 +172,7 @@ def main(input_dir, base_dil):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--input_dir', type=str,
-                        default='C:/Users/lzoeckler/Desktop/4plex',
+                        default='C:/Users/lzoeckler/Desktop/5plex',
                         help='Input directory')
     parser.add_argument('-bd', '--base_dilution', type=int,
                         default=20,
