@@ -352,5 +352,9 @@ def main(input_dir):
 
 
 if __name__ == "__main__":
-    'C:/Users/lzoeckler/Desktop/mali_meta'
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-id', '--input_dir', type=str,
+                        default='C:/Users/lzoeckler/Desktop/mali_meta',
+                        help='Input directory')
+    args = parser.parse_args()
+    main(input_dir=args.input_dir)

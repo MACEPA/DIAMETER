@@ -78,4 +78,8 @@ def main(input_dir):
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-id', '--input_dir', type=str,
+                        help='Input directory')
+    args = parser.parse_args()
+    main(input_dir=args.input_dir)
