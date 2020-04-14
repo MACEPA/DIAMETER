@@ -47,7 +47,7 @@ def main(input_dir):
     usable_data = usable_data.loc[~usable_data['participant_id'].isin(otherwise_bad_pids)]
     # Set the default initial class color to purple, will be overwritten later
     usable_data['class'] = 'purple'
-    # Split into 0, 1, and 2 treatment day pids (all 3 treatment day pids are bad, so no need to split them)
+    # Split into 0, 1, and 2 treatment day pids (all 3 treatment day pids are unusable, so no need to split them)
     no_tday = []
     one_tday = []
     two_tday = []
@@ -82,68 +82,95 @@ def main(input_dir):
         study_data = pid_data.loc[~pid_data['HRP2_pg_ml'].isnull()]
         study_days = study_data['date_dif'].tolist()
         study_days.sort()
+        # Set PIDs where all HRP2 values are lower than 1.4 pg/ml to blue/uninfected
         if (study_data['HRP2_pg_ml'] < 1.4).all():
             pid_data.loc[pid_data['date_dif'].isin(study_days), 'class'] = 'blue'
+        # For all other points...
         else:
+            # Set an infection place holder to 0
             infection = 0
+            # Iterate over all days in each PID
             for day_i in range(0, len(study_days)):
                 day = study_days[day_i]
                 day_data = pid_data.loc[pid_data['date_dif'] == day]
+                # Try to retrieve the HRP2 value for the day
                 try:
                     day_hrp2 = day_data['HRP2_pg_ml'].item()
                 except ValueError:
                     print(pid, day)
                     pass
-                # classify all points
+                # Classify all points, based on the current and previous HRP2 values
+                # If the day HRP2 value is less than 1.4 pg/ml and there hasn't been an infection yet, classify as blue
                 if day_hrp2 < 1.4 and infection == 0:
                     pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'blue'
+                # If the day HRP2 value is greater than 1.4 pg/ml...
                 elif day_hrp2 >= 1.4:
+                    # If it's greater than 2 pg/ml, classify as yellow/asymptomatic
                     if day_hrp2 > 2:
                         pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'yellow'
+                    # Otherwise...
                     else:
+                        # Try to get the previous day's HRP2 value
                         try:
                             prev_day = study_days[day_i - 1]
                             prev_data = pid_data.loc[pid_data['date_dif'] == prev_day]
                             prev_class = prev_data['class'].item()
+                            # If the previous class was blue or purple, classify as yellow
                             if prev_class in ['blue', 'purple']:
                                 pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'yellow'
+                            # Otherwise set equal to the previous class
                             else:
                                 pid_data.loc[pid_data['date_dif'] == day, 'class'] = prev_class
+                        # If you can't get the previous day's value, classify as yellow
                         except IndexError:
                             pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'yellow'
+                    # If the HRP2 value was greater than 1.4 pg/ml, set the infection placeholder to 1
                     infection = 1
+                # If the day HRP2 value is less than 1.4 pg/ml but the infection placeholder is 1, classify as
+                # green/clearing
                 elif day_hrp2 < 1.4 and infection == 1:
                     pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'green'
         classed_no_tday.append(pid_data)
     classed_no_tday = pd.concat(classed_no_tday)
-
+    # Second, run on patient IDs with one treatment day
     classed_one_tday = []
+    # Loop over all patient IDs with one treatment day
     for pid in one_tday['participant_id'].unique():
+        # Subset to that specific patient ID
         pid_data = one_tday.loc[one_tday['participant_id'] == pid]
+        # Sort the dataframe based on the date_dif date column
         pid_data.sort_values('date_dif', inplace=True)
         study_days = pid_data.loc[~pid_data['HRP2_pg_ml'].isnull(), 'date_dif'].tolist()
         study_days.sort()
+        # Subset out the treatment day
         tday = pid_data.loc[~pid_data['drug'].isnull(), 'date_dif'].item()
+        # Set the infection placeholder to 0
         infection = 0
+        # Iterate over the study days for the participant
         for day_i in range(0, len(study_days)):
             day = study_days[day_i]
             day_data = pid_data.loc[pid_data['date_dif'] == day]
+            # Try to retrieve the HRP2 value for the given day
             try:
                 day_hrp2 = day_data['HRP2_pg_ml'].item()
             except ValueError:
                 print(pid, day)
                 pass
-            # classify symptomatic points
+            # Classify points immediately around the day of treatment as red/symptomatic
             if (tday - 2) <= day <= (tday + 2):
                 pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'red'
-            # classify points before the treatment
+            # Classify points before the treatment day...
             elif day < tday:
+                # If the day HRP2 value is less than 1.4 pg/ml and the infection placeholder is 0, classify as blue
                 if day_hrp2 < 1.4 and infection == 0:
                     pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'blue'
+                # If the day HRP2 value is greater than 1.4 pg/ml...
                 elif day_hrp2 >= 1.4:
+                    # If the day HRP2 value is greater than 2 pg/ml, classify as yellow
                     if day_hrp2 > 2:
                         pid_data.loc[pid_data['date_dif'] == day, 'class'] = 'yellow'
                     else:
+                        # Otherwise, 
                         try:
                             prev_day = study_days[day_i - 1]
                             prev_data = pid_data.loc[pid_data['date_dif'] == prev_day]
