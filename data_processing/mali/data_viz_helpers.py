@@ -1,6 +1,8 @@
 import numpy as np
 
 
+# Function for cleaning analyte values
+# This function DOES NOT log values
 def clean_strings(val):
     if isinstance(val, str):
         clean = val.replace('<', '')
