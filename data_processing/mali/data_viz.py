@@ -374,48 +374,57 @@ def main(input_dir):
     # Combine all the classed data and sort by participant ID
     classed_data = pd.concat([classed_no_tday, classed_one_tday, classed_two_tday])
     classed_data.sort_values('participant_id', inplace=True)
-    #
-    split_pdf = PdfPages('C:/Users/lzoeckler/Desktop/mali_meta/NIH_mali_class_attempt_day_split.pdf')
+    # Start creating a series of plots, saved in one file in the input directory
+    split_pdf = PdfPages('{}/NIH_mali_class_attempt_day_split.pdf'.format(input_dir))
+    # Loop over each patient ID in the fully classed dataset
     for pid in classed_data['participant_id'].unique():
+        # Subset down to only the given patient ID
         combo = classed_data.loc[classed_data['participant_id'] == pid]
+        # If there's actually data associated with the patient ID, generate a plot
         if len(combo) > 0:
+            # Sort the data by the date_dif column
             combo.sort_values('date_dif', inplace=True)
+            # Pull out the HRP2 values that aren't null
             for_line = combo.loc[~combo['HRP2_pg_ml'].isnull()]
+            # Identify the max and min days in the date_dif column
             max_day = max(combo['date_dif'])
             min_day = min(combo['date_dif'])
-            try:
-                max_y = max([max(for_line['HRP2_pg_ml']), max(for_line['LDH_Pan_pg_ml'])])
-                min_y = min([min(for_line['HRP2_pg_ml']), min(for_line['LDH_Pan_pg_ml'])])
-            except ValueError:
-                print(pid)
-                continue
+            # Create a plot, to fill with pretty pictures
             f, ax1 = plt.subplots()
-            age = combo['age_yrs'].unique()[0]
+            # Pull out the treatment dates
             treatment_days = combo.loc[~combo['drug'].isnull(), 'date_dif'].tolist()
+            # Loop over the treatment dates
             for day in treatment_days:
+                # Plot a purple vertical line on each treatment date
                 ax1.plot(np.array([day, day]), np.array([0, 6.5]), color='purple',
                          linestyle='--', alpha=0.6)
+            # Plt two different limit of detection lines, for HRP2 (red) and pLDH (green)
             hrp2_urdt_lod = ax1.plot(np.array([min_day, max_day]), np.array([1.4, 1.4]),
                                      color='red', linestyle='--', alpha=0.6)
-            hrp2_urdt_lod = ax1.plot(np.array([min_day, max_day]), np.array([3, 3]),
+            pldh_urdt_lod = ax1.plot(np.array([min_day, max_day]), np.array([3, 3]),
                                      color='green', linestyle='--', alpha=0.6)
-            title = """patient_id: {}""".format(pid)
+            # Plot the HRP2 values against date, in black
             ln4 = ax1.plot(for_line['date_dif'], for_line['HRP2_pg_ml'],
                            c='black', alpha=0.6, label='HRP2')
+            # Plot the pLDH values against date, in green
             ln3 = ax1.plot(for_line['date_dif'], for_line['LDH_Pan_pg_ml'],
                            c='green', alpha=0.6, label='pLDH')
+            # Try to plot HRP2 points against date with color based on class
+            # (This is why we had class labels as colors)
             try:
                 ax1.scatter(for_line['date_dif'], for_line['HRP2_pg_ml'], c=for_line['class'])
             except ValueError:
                 print(pid)
                 continue
+            # Set the plot title, x label, y label, and y limits
+            title = """patient_id: {}""".format(pid)
             ax1.set_title(title)
             ax1.set_xlabel('Time point, in days')
             ax1.set_ylabel('Log10 of pg/ml')
             ax1.set_ylim([-.5, 7])
-
-            # LINE STUFF
+            # Combine existing scatter lines
             lns = ln4 + ln3
+            # Create a bunch of dummy lines for the legend
             lns = lns + [Line2D([0], [0], marker='o', color='k', label='Symptomatic', markerfacecolor='r',
                                 markersize=10, alpha=0.6)]
             lns = lns + [Line2D([0], [0], marker='o', color='k', label='Clearing', markerfacecolor='g',
@@ -430,6 +439,7 @@ def main(input_dir):
             lns = lns + [Line2D([0], [0], color='green', linestyle='--', label='Target pLDH uRDT LoD', alpha=0.6)]
             lns = lns + [Line2D([0], [0], color='purple', linestyle='--', label='Treated', alpha=0.6)]
             labs = [line.get_label() for line in lns]
+            # Generate the legend, using all the dummy lines
             ax1.legend(lns, labs, bbox_to_anchor=(.75, -.2), ncol=2)
 
             # Actually plot stuff
@@ -437,8 +447,10 @@ def main(input_dir):
             split_pdf.savefig(f)
             plt.show()
             plt.close()
+        # If there's no data associated with the patient ID, print the patient ID and move on
         else:
             print(pid)
+    # Close the pdf
     split_pdf.close()
 
 
