@@ -5,21 +5,19 @@ import pandas as pd
 from functools import partial, reduce
 # import helper functions
 from fiveplex_processing_helpers import run_compare, return_decisions, set_hrp2_alerts
-from core_processing_helpers import fix_concentrations, build_dil_constants
+from core_processing_helpers import fix_concentrations
 # import constants
 from core_processing_helpers import THRESHOLDS
 
 
 # function for determining which dilution value to use
-def decider(base_df, base_dil):
-    # create the dilution constants via the base dilution
-    dil_cons = build_dil_constants(base_dil)
+def decider(base_df):
     # create an empty list to fill with small dfs, which will be combined
     analyte_dfs = []
     # create an empty dictionary to fill with errors associated with patient IDs
     error_pids = {}
     # iterate over analytes
-    for analyte in THRESHOLDS[5].keys():
+    for analyte in THRESHOLDS[5]['ulq'].keys():
         patient_dfs = []
         # iterate over patient_ids
         for pid in base_df['patient_id'].unique():
@@ -67,7 +65,7 @@ def decider(base_df, base_dil):
                                          'error'].item()
                 elif decision == 'fail':
                     val = 'fail'
-                    well = np.nan
+                    well = 'fail'
                     error = np.nan
                     # if it's a fail case, add the error to the list of errors
                     # for the specific patient ID
@@ -174,8 +172,5 @@ if __name__ == '__main__':
     parser.add_argument('-id', '--input_dir', type=str,
                         default='C:/Users/lzoeckler/Desktop/5plex',
                         help='Input directory')
-    parser.add_argument('-bd', '--base_dilution', type=int,
-                        default=20,
-                        help='Base value for going up chain of dilution (1 -> 50 -> 2500 -> etc.)')
     args = parser.parse_args()
-    main(input_dir=args.input_dir, base_dil=args.base_dilution)
+    main(input_dir=args.input_dir)
