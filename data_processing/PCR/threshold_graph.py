@@ -9,8 +9,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 from threshold_helpers import clean_strings
 
 
-def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_lower_threshold, hrp2_upper_threshold,
-         run_single, run_dual, show):
+def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2,
+         hrp2_lower_threshold, hrp2_upper_threshold, run_single, run_dual, show):
     # Convert pg values to ng for labeling
     ng_lower = lower_threshold / 1000
     ng_upper = upper_threshold / 1000
@@ -100,19 +100,24 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_low
                       (non_feb_pv_df, 'Non-febrile Pv+ PCR+ pLDH', 'non_febrile_pv_plot'),
                       (pf_df, 'Pf+ PCR+ pLDH', 'pf_plot'), (pv_df, 'Pv+ PCR+ pLDH', 'pv_plot')]
 
-        # Run over collected dataframes and metadata
+        # Loop over collected dataframes and metadata
         for test_df, pdf_title, plot_title in value_list:
             # Get density distribution of pLDH values
             x = test_df['quansys_LDH_Pan_pg_ml'].values
-
+            # Create a subset where pLDH is inbetween the lower and upper thresholds and find the length of the subset
             sub = test_df.loc[test_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)]
             sub = sub.loc[sub['quansys_LDH_Pan_pg_ml'] < np.log10(upper_threshold)]
             sub = len(sub)
+            # Create a subset where pLDH is below the lower threshold, find its length
             below = len(test_df.loc[test_df['quansys_LDH_Pan_pg_ml'] < np.log10(lower_threshold)])
+            # Create a subset where pLDH is above the lower threshold, find its length
             above = len(test_df.loc[test_df['quansys_LDH_Pan_pg_ml'] > np.log10(lower_threshold)])
+            # Create a subset where pLDH is above the upper threshold, find its length
             ten_above = len(test_df.loc[test_df['quansys_LDH_Pan_pg_ml'] > np.log10(upper_threshold)])
+            # Find the length of all samples in the given dataframe
             total = len(test_df)
-
+            # Create an extremely complicated title using the data obtained above, also calculate percent of each
+            # subset to total
             title = '''{p}\n{s}/{t} samples fall between {lt} and {ut} ng/ml (~{st}%)
             {b}/{t} samples fall below {lt} ng/ml (~{bt}%)\n{a}/{t} samples fall above {lt} ng/ml(~{at}%)
             {ta}/{t} samples fall above {ut} ng/ml (~{tat}%)'''.format(p=pdf_title, t=total, s=sub, lt=ng_lower,
@@ -121,7 +126,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_low
                                                                        bt=np.round(100 * (below / total), 1),
                                                                        at=np.round(100 * (above / total), 1),
                                                                        tat=np.round(100 * (ten_above / total), 1))
-
+            # Create graphs for output
             pp = PdfPages('{}/{}_{}ng_{}ng.pdf'.format(output_dir, plot_title, ng_lower, ng_upper))
             ax = sns.distplot(x, hist=False, color='k')
             ln = ax.lines[0]
@@ -147,7 +152,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_low
             plt.close()
             pp.close()
 
-    # Run the following code only if dual graphs (with two density lines, febrile and non) are desired
+    # Run the following code only if dual graphs (with two density lines, febrile and non-febrile) are desired
     if run_dual:
         print('Running dual plots')
         for feb_df, non_feb_df, species in [(feb_df, non_feb_df, 'Pf&Pv'), (feb_pf_df, non_feb_pf_df, 'Pf'),
@@ -256,8 +261,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_low
             ln = ax.lines[0]
             y = ln.get_ydata()
             x2a = ln.get_xdata()
-            ax.fill_between(x2a, 0, y, where=(0.05 > x2a) & (x2a > -10), color='purple',
-                            label='Samples below LoD')
+            ax.fill_between(x2a, 0, y, where=(0.05 > x2a) & (x2a > -10), color='purple', label='Samples below LoD')
             sns.distplot(x1, hist=False, color='b', label='Febrile, {}'.format(species))
             ax.axvline(np.log10(hrp2_lower_threshold), color='r')
             ax.axvline(np.log10(hrp2_upper_threshold), color='g')
@@ -265,8 +269,8 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2, hrp2_low
             ax.legend()
             ax.set_ylabel('Density')
             ax.set_xlabel(title2, fontsize=12)
-            plt.xticks([-1, 0, 1, np.log10(80), np.log10(400), 4, 6, 8], [0.1, 1, 10, 80, 400, 10000, 1000000,
-                                                                          100000000])
+            plt.xticks([-1, 0, 1, np.log10(80), np.log10(400), 4, 6, 8],
+                       [0.1, 1, 10, 80, 400, 10000, 1000000, 100000000])
             f = ax.get_figure()
             plt.title(title1)
             plt.tight_layout()

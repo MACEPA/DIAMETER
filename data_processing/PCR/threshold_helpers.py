@@ -2,7 +2,7 @@ import numpy as np
 
 
 # Function for cleaning analyte values
-# This function DOES log values
+# This function DOES log values (and offsets them by .1 to do so)
 def clean_strings(val):
     if isinstance(val, str):
         if '<' in val:
