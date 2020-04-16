@@ -15,9 +15,8 @@ from data_viz_helpers import (clean_strings, rebuild_data,
 from data_viz_helpers import (COLOR_DICT, SHAPE_DICT, ANALYTE_INFO)
 
 
-def analyte_shapes(main_data, analyte, analyte_name):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/{}_graphs.pdf'.format(output_fp, analyte))
+def analyte_shapes(main_data, analyte, analyte_name, output_dir):
+    pp = PdfPages('{}/{}_graphs.pdf'.format(output_dir, analyte))
     # create individual graphs for each patient_id
     for pid in main_data['patient_id'].unique():
         # subset data
@@ -79,9 +78,8 @@ def analyte_shapes(main_data, analyte, analyte_name):
     pp.close()
 
 
-def analyte_point_individuals(main_data, analyte, analyte_name):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/{}_all_individuals.pdf'.format(output_fp, analyte))
+def analyte_point_individuals(main_data, analyte, analyte_name, output_dir):
+    pp = PdfPages('{}/{}_all_individuals.pdf'.format(output_dir, analyte))
     # subset data to analyte of interest
     point_data = main_data[['patient_id', 'time_point_days', analyte,
                             '{}_dilution'.format(analyte),
@@ -124,9 +122,8 @@ def analyte_point_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def analyte_connected_individuals(main_data, analyte, analyte_name):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/{}_all_connected.pdf'.format(output_fp, analyte))
+def analyte_connected_individuals(main_data, analyte, analyte_name, output_dir):
+    pp = PdfPages('{}/{}_all_connected.pdf'.format(output_dir, analyte))
     # create main graph
     f = plt.figure()
     f.add_subplot()
@@ -159,9 +156,8 @@ def analyte_connected_individuals(main_data, analyte, analyte_name):
     pp.close()
 
 
-def plot_hrp2_groups(main_data, version):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/HRP2_{}_groups.pdf'.format(output_fp, version))
+def plot_hrp2_groups(main_data, output_dir):
+    pp = PdfPages('{}/HRP2_groups.pdf'.format(output_dir))
     for pid in main_data['patient_id'].unique():
         # subset data to individual patient_id
         combo = main_data.loc[main_data['patient_id'] == pid]
@@ -207,9 +203,9 @@ def plot_hrp2_groups(main_data, version):
     pp.close()
 
 
-def plot_meta(main_data):
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    pp = PdfPages('{}/meta_namibia.pdf'.format(output_fp))
+# CURRENTLY UNUSED
+def plot_meta(main_data, output_dir):
+    pp = PdfPages('{}/meta_namibia.pdf'.format(output_dir))
     for pid in main_data['patient_id'].unique():
         # subset data to individual patient_id
         combo = main_data.loc[main_data['patient_id'] == pid]
@@ -279,12 +275,12 @@ def plot_meta(main_data):
     pp.close()
 
 
-def plot_zero_density(main_data):
+# CURRENTLY UNUSED
+def plot_zero_density(main_data, output_dir):
     # generate a density plot of time points with both group 1 and group 2
     # this plot includes day 0. the other does not
     # note that these could be bar graphs, but density plots are super easy
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    density = PdfPages('{}/time_point_density_with_zero.pdf'.format(output_fp))
+    density = PdfPages('{}/time_point_density_with_zero.pdf'.format(output_dir))
     good_zero = main_data.loc[main_data['group'] == 'blue']
     good_zero.rename({'time_point_days': 'Group 1 days'}, axis=1, inplace=True)
     # actual density plot is a one liner
@@ -301,12 +297,12 @@ def plot_zero_density(main_data):
     density.close()
 
 
-def plot_nonzero_density(main_data):
+# CURRENTLY UNUSED
+def plot_nonzero_density(main_data, output_dir):
     # generate a density plot of time points with both group 1 and group 2
     # this plot does not include day 0. the other does
     # note that these could be bar graphs, but density plots are super easy
-    output_fp = 'C:/Users/lzoeckler/Desktop/4plex/output_data'
-    density = PdfPages('{}/time_point_density_without_zero.pdf'.format(output_fp))
+    density = PdfPages('{}/time_point_density_without_zero.pdf'.format(output_dir))
     good_no_zero = main_data.loc[main_data['group'] == 'blue']
     good_no_zero = good_no_zero.loc[good_no_zero['time_point_days'] != 0]
     good_no_zero.rename({'time_point_days': 'Group 1 days'}, axis=1, inplace=True)
@@ -325,8 +321,8 @@ def plot_nonzero_density(main_data):
     density.close()
 
 
-def plot_all_points_analytes(main_data, version):
-    ratios = PdfPages('C:/Users/lzoeckler/Desktop/4plex/output_data/{}_good_vs_bad_points.pdf'.format(version))
+def plot_all_points_analytes(main_data, output_dir):
+    ratios = PdfPages('{}/good_vs_bad_points.pdf'.format(output_dir, version))
     # create pairs of analytes to iterate over
     pairs = [('HRP2_pg_ml', 'LDH_Pan_pg_ml'), ('HRP2_pg_ml', 'CRP_ng_ml'), ('LDH_Pan_pg_ml', 'CRP_ng_ml')]
     # create a line to use in graphs, for y = x function
@@ -384,7 +380,7 @@ def plot_all_points_analytes(main_data, version):
     ratios.close()
 
 
-def main(input_dir, run_shapes, run_points, run_connected, run_group):
+def main(input_dir, output_dir, run_shapes, run_points, run_connected, run_group):
     # read in formatted dilution CSV
     main_data = pd.read_csv('{}/final_dilutions.csv'.format(input_dir))
     # loop through analytes to create different PDFs for each
@@ -392,13 +388,13 @@ def main(input_dir, run_shapes, run_points, run_connected, run_group):
         analyte_name = ANALYTE_INFO[analyte]
         # produce analyte shape graphs
         if run_shapes:
-            analyte_shapes(main_data, analyte, analyte_name)
+            analyte_shapes(main_data, analyte, analyte_name, output_dir)
         # produce analyte individual graphs with trend lines, unconnected
         if run_points:
-            analyte_point_individuals(main_data, analyte, analyte_name)
+            analyte_point_individuals(main_data, analyte, analyte_name, output_dir)
         # produce analyte individual graphs without trend lines, connected
         if run_connected:
-            analyte_connected_individuals(main_data, analyte, analyte_name)
+            analyte_connected_individuals(main_data, analyte, analyte_name, output_dir)
         # produce HRP2 groups
     if run_group:
         val_cols = ['HRP2_pg_ml', 'LDH_Pan_pg_ml', 'CRP_ng_ml']
@@ -410,13 +406,16 @@ def main(input_dir, run_shapes, run_points, run_connected, run_group):
         # get grouped data
         grouped_data = hrp2_grouping(outliered_data)
         # generate all the different plots
-        plot_hrp2_groups(grouped_data)
-        plot_all_points_analytes(grouped_data)
+        plot_hrp2_groups(grouped_data, ouput_dir)
+        plot_all_points_analytes(grouped_data, output_dir)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--input_dir', type=str,
+                        default='C:/Users/lzoeckler/Desktop/4plex/output_data',
+                        help='Input directory for all PCR data')
+    parser.add_argument('-od', '--output_dir', type=str,
                         default='C:/Users/lzoeckler/Desktop/4plex/output_data',
                         help='Input directory for all PCR data')
     parser.add_argument('-rs', '--run_shapes', action='store_true',

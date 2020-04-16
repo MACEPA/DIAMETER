@@ -126,7 +126,7 @@ def main(input_dir, output_dir, lower_threshold, upper_threshold, hrp2,
                                                                        bt=np.round(100 * (below / total), 1),
                                                                        at=np.round(100 * (above / total), 1),
                                                                        tat=np.round(100 * (ten_above / total), 1))
-            # Create graphs for output
+            # The rest of this script is all generating graphs for output
             pp = PdfPages('{}/{}_{}ng_{}ng.pdf'.format(output_dir, plot_title, ng_lower, ng_upper))
             ax = sns.distplot(x, hist=False, color='k')
             ln = ax.lines[0]
